@@ -74,24 +74,18 @@ const gameState = [
 ];
 
 // Set up Redis Client
-async function setupGameState() {
-    try {
-        const result = await redis.rpush('gameState', ...gameState);
-        console.log(result);
-    } catch (e) {
-        console.error(e);
-    }
-}
-setupGameState();
+redis.sadd('gameState', gameState);
 
 app.get('/', (req, res) => {
   res.send('API working');
 });
 
 // Get game state of chessboard
-app.get('/getGameState', async (req, res) => {
-    const gameState = await getGameState();
-    res.json(gameState);
+app.get('/getGameState', (req, res) => {
+    redis.smembers('gameState').then(function(result) {
+        console.log(result);
+        res.json(result);
+    });
 });
 
 // Make a move and update chessboard
@@ -103,12 +97,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, function() {
   console.log(`App listening on port ${PORT}`);
 });
-
-
-async function getGameState() {
-    try {
-        return await redis.lrange('gameState', 0, -1);
-    } catch (error) {
-        console.log(error);
-    }
-}
