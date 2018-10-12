@@ -86,6 +86,7 @@ app.get('/', (req, res) => {
 
 // Get game state of chessboard
 app.get('/getGameState', async (req, res) => {
+    const redis = new Redis();
     try {
         const gameState = await redis.lrange('gameState',0,-1);
         res.json(gameState);
