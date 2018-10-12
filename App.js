@@ -1,23 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
+import Board from './components/Board';
 
 export default class App extends React.Component {
   constructor() {
     super();
-    this.state = { text: 'Open up App.js to start working on your app!' };
   }
   render() {
     return (
       <View style={styles.container}>
-        <Text>{this.state.text}</Text>
-
-        {/* Example of calling API using node fetch */}
-        <Button title="Get GameState" onPress={() => {
-          fetch('https://ghost-chess.herokuapp.com/getGameState')
-            .then(res => res.text())
-            .then(text => this.setState({ text: text }));
-        }} />
-
+        <Board/>
       </View>
     );
   }
