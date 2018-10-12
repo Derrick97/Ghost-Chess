@@ -90,12 +90,8 @@ app.get('/', (req, res) => {
 
 // Get game state of chessboard
 app.get('/getGameState', async (req, res) => {
-    try {
-        const gameState = await redis.lrange('gameState',0,-1);
-        res.json(gameState);
-    } catch (error) {
-        console.error(error);
-    }
+    const gameState = await getGameState();
+    res.json(gameState);
 });
 
 // Make a move and update chessboard
@@ -107,3 +103,12 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, function() {
   console.log(`App listening on port ${PORT}`);
 });
+
+
+async function getGameState() {
+    try {
+        return await redis.lrange('gameState', 0, -1);
+    } catch (error) {
+        console.log(error);
+    }
+}
