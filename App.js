@@ -1,15 +1,16 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
-import ChessBoard from './ChessBoard';
+import Board from './components/Board';
 
 export default class App extends React.Component {
   constructor() {
     super();
-    this.state = { text: 'Open x App.js to start working on your app!' };
   }
   render() {
     return (
-       <ChessBoard/>
+      <View style={styles.container}>
+        <Board/>
+      </View>
     );
   }
 }
