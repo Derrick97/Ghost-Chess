@@ -10,8 +10,6 @@ const StyledBoard = styled.View`
     justifyContent: space-between;
 `;
 
-
-
 export default class Board extends React.Component {
     constructor() {
         super();

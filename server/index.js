@@ -5,6 +5,7 @@ app.use(BodyParser.urlencoded({ extended: false }))
 app.use(BodyParser.json())
 
 const gameState = [
+    'gameState',
     {col: 0, row: 0, piece: null},
     {col: 1, row: 0, piece: null},
     {col: 2, row: 0, piece: null},
@@ -75,7 +76,7 @@ const gameState = [
 const redisClient = require('redis').createClient(process.env.REDIS_URL);
 redisClient.on('connect', () => console.log('Redis client connected'));
 redisClient.on('error', err => console.log('Redis client error: ' + err));
-redisClient.set('gameState', gameState);
+redisClient.rpush(gameState);
 
 app.get('/', (req, res) => {
   res.send('API working');
@@ -83,7 +84,7 @@ app.get('/', (req, res) => {
 
 // Get game state of chessboard
 app.get('/getGameState', (req, res) => {
-  redisClient.get('gameState', function (error, result) {
+  redisClient.lrange('gameState',0, -1, function (error, result) {
     if (error) throw error;
     res.json(result);
   })
