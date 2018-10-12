@@ -77,7 +77,6 @@ const redis = new Redis(process.env.REDIS_URL);
 try {
     redis.rpush('gameState', gameState);
 } catch (error) {console.error(error);}
-redis.disconnect();
 
 
 app.get('/', (req, res) => {
@@ -86,14 +85,12 @@ app.get('/', (req, res) => {
 
 // Get game state of chessboard
 app.get('/getGameState', async (req, res) => {
-    const redis = new Redis(process.env.REDIS_URL);
     try {
         const gameState = await redis.lrange('gameState',0,-1);
         res.json(gameState);
     } catch (error) {
         console.error(error);
     }
-    redis.disconnect();
 });
 
 // Make a move and update chessboard
