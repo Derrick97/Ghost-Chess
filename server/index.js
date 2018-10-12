@@ -108,6 +108,7 @@ app.listen(PORT, function() {
 async function getGameState() {
     try {
         redis.smembers('gameState').then(function(result) {
+            console.log(result);
             return result;
         });
     } catch (error) {
