@@ -86,7 +86,7 @@ app.get('/', (req, res) => {
 // Get game state of chessboard
 app.get('/getGameState', (req, res) => {
   redisClient.lrange('gameState', 0, -1, function (err, reply) {
-    res.send(JSON.parse(reply));
+    res.json(reply.map(obj => JSON.parse(obj)));
   });
 });
 
