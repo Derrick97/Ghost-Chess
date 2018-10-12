@@ -74,12 +74,15 @@ const gameState = [
 ];
 
 // Set up Redis Client
-try {
-    const result = redis.rpush('gameState', ...gameState);
-    console.log(result);
-} catch (e) {
-    console.error(e);
+async function setupGameState() {
+    try {
+        const result = await redis.rpush('gameState', ...gameState);
+        console.log(result);
+    } catch (e) {
+        console.error(e);
+    }
 }
+setupGameState();
 
 app.get('/', (req, res) => {
   res.send('API working');
