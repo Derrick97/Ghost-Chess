@@ -75,7 +75,7 @@ redisClient.flushall(function (err, res) {
     { col: 6, row: 7, piece: null },
     { col: 7, row: 7, piece: null },
   ];
-  redisClient.rpush("gameState", gameState);
+  redisClient.rpush("gameState", gameState.map(obj => JSON.stringify(obj)));
 });
 
 
