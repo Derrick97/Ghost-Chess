@@ -75,9 +75,7 @@ redisClient.flushall(function (err, res) {
     { col: 6, row: 7, piece: null },
     { col: 7, row: 7, piece: null },
   ];
-  redisClient.sadd("gameState", gameState, function (err, res) {
-    console.log(res);
-  })
+  redisClient.rpush("gameState", gameState);
 });
 
 
@@ -87,8 +85,7 @@ app.get('/', (req, res) => {
 
 // Get game state of chessboard
 app.get('/getGameState', (req, res) => {
-  redisClient.smembers('gameState', function (err, reply) {
-    console.log(reply);
+  redisClient.lrange('gameState', function (err, reply) {
     res.json(reply);
   });
 });
