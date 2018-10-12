@@ -88,7 +88,7 @@ app.get('/', (req, res) => {
 // Get game state of chessboard
 app.get('/getGameState', (req, res) => {
   redisClient.smembers('gameState', function (err, reply) {
-    console.log(resply);
+    console.log(reply);
     res.json(reply);
   });
 });
