@@ -1,11 +1,11 @@
 const express = require("express");
 const BodyParser = require("body-parser");
+const Redis = require('ioredis');
 const app = express();
 app.use(BodyParser.urlencoded({ extended: false }))
 app.use(BodyParser.json())
 
 const gameState = [
-    'gameState',
     {col: 0, row: 0, piece: null},
     {col: 1, row: 0, piece: null},
     {col: 2, row: 0, piece: null},
@@ -70,29 +70,34 @@ const gameState = [
     {col: 5, row: 7, piece: null},
     {col: 6, row: 7, piece: null},
     {col: 7, row: 7, piece: null},
-]
+];
 
 // Set up Redis Client
-const redisClient = require('redis').createClient(process.env.REDIS_URL);
-redisClient.on('connect', () => console.log('Redis client connected'));
-redisClient.on('error', err => console.log('Redis client error: ' + err));
-redisClient.rpush(gameState);
+const redis = new Redis();
+try {
+    redis.rpush('gameState', gameState);
+} catch (error) {console.error(error);}
+redis.disconnect();
+
 
 app.get('/', (req, res) => {
   res.send('API working');
 });
 
 // Get game state of chessboard
-app.get('/getGameState', (req, res) => {
-  redisClient.lrange('gameState',0, -1, function (error, result) {
-    if (error) throw error;
-    res.json(result);
-  })
+app.get('/getGameState', async (req, res) => {
+    try {
+        const gameState = await redis.lrange('gameState',0,-1);
+        res.json(gameState);
+    } catch (error) {
+        console.error(error);
+    }
+    redis.disconnect();
 });
 
 // Make a move and update chessboard
 app.post('/makeMove', (req, res) => {
-  redisClient.set('gameState', 'newGameStateObject');
+  res.send('make move');
 });
 
 const PORT = process.env.PORT || 5000;
