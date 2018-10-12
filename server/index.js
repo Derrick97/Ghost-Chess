@@ -5,6 +5,7 @@ const app = express();
 app.use(BodyParser.urlencoded({ extended: false }))
 app.use(BodyParser.json())
 
+const redis = new Redis(process.env.REDIS_URL);
 const gameState = [
     {col: 0, row: 0, piece: null},
     {col: 1, row: 0, piece: null},
@@ -73,18 +74,21 @@ const gameState = [
 ];
 
 // Set up Redis Client
-const redis = new Redis(process.env.REDIS_URL);
-redis.rpush('gameState', gameState);
-
+try {
+    const result = redis.rpush('gameState', ...gameState);
+    console.log(result);
+} catch (e) {
+    console.error(e);
+}
 
 app.get('/', (req, res) => {
   res.send('API working');
 });
 
 // Get game state of chessboard
-app.get('/getGameState', (req, res) => {
+app.get('/getGameState', async (req, res) => {
     try {
-        const gameState = redis.lrange('gameState',0,-1);
+        const gameState = await redis.lrange('gameState',0,-1);
         res.json(gameState);
     } catch (error) {
         console.error(error);
