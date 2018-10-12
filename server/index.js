@@ -75,7 +75,7 @@ redisClient.flushall(function (err, res) {
     { col: 6, row: 7, piece: null },
     { col: 7, row: 7, piece: null },
   ];
-  redisClient.rpush("gameState", JSON.stringify(gameState));
+  redisClient.rpush("gameState", gameState.map(obj => JSON.stringify(obj)));
 });
 
 
@@ -86,8 +86,7 @@ app.get('/', (req, res) => {
 // Get game state of chessboard
 app.get('/getGameState', (req, res) => {
   redisClient.lrange('gameState', 0, -1, function (err, reply) {
-    console.log(reply);
-    res.send(reply.map(obj => JSON.parse(obj)));
+    res.json(reply.map(obj => JSON.parse(obj)));
   });
 });
 
