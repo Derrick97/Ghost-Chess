@@ -34,12 +34,12 @@ export default class Board extends React.Component {
                 firstIndex: this.state.storedIndex,
                 secondIndex: index
             };
-            fetch('https://ghost-chess.herokuapp.com/getGameState', {
+            fetch('https://ghost-chess.herokuapp.com/makeMove', {
                 method: 'POST', 
                 body: JSON.stringify(body),
             })
-            .then(res => res.json)
-            .then(json => updateView(json));
+            .then(res => res.json())
+            .then(json => this.updateView(json.body));
             this.setState({
                 clicked: false,
             })
