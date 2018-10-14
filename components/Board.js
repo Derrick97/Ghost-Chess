@@ -13,9 +13,14 @@ const StyledBoard = styled.View`
 
 
 export default class Board extends React.Component {
+    
+
     constructor() {
         super();
-        this.state = {gameState: null}
+        this.state = {
+            gameState: null,
+            clicked: false
+        }
     }
 
     componentDidMount() {
@@ -36,4 +41,14 @@ export default class Board extends React.Component {
             </StyledBoard>
         )
     }
+
+    handlePress(cell) {
+        if (clicked === false) {
+            clicked = true;
+        } else {
+            fetch('https://ghost-chess.herokuapp.com/getGameState')
+        }
+    }
+
+
 }

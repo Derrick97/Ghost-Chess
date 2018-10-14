@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
-import Board from './components/Board';
+// import Board from './components/Board';
+import ChessBoard from './ChessBoard';
 
 export default class App extends React.Component {
   constructor() {
@@ -9,20 +10,21 @@ export default class App extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Board/>
+      <ChessBoard/>
+        {/* <Board/> */}
       </View>
     );
   }
 }
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
         // {/* Example of calling API using node fetch */}
         // <Button title="Get GameState" onPress={() => {
