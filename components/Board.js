@@ -41,9 +41,9 @@ export default class Board extends React.Component {
             };
             fetch('https://ghost-chess.herokuapp.com/makeMove', {
                 method: 'POST',
-                body: JSON.stringify(body),
+                body: body,
             })
-                .then(res => res.json)
+                .then(res => res.json())
                 .then(json => this.setState({gameState: json}));
             this.setState({
                 clicked: false,
@@ -51,6 +51,9 @@ export default class Board extends React.Component {
         }
     }
 
+    // test(json) {
+    //     console.log(json);
+    // }
     //To use the JSON object returned from the server and update the board state
     // updateView(json) {
     //     this.setState({gameState: json})
