@@ -21,6 +21,7 @@ export default class Board extends React.Component {
             storedIndex: null,
         }
         this.handleCellPress = this.handleCellPress.bind(this)
+        this.updateView = this.updateView.bind(this)
     }
 
     handleCellPress(index){
@@ -35,9 +36,19 @@ export default class Board extends React.Component {
             };
             fetch('https://ghost-chess.herokuapp.com/getGameState', {
                 method: 'POST', 
-                body: body,
-            });
+                body: JSON.stringify(body),
+            })
+            .then(res => res.json)
+            .then(json => updateView(json));
+            this.setState({
+                clicked: false,
+            })
         }
+    }
+
+    //To use the JSON object returned from the server and update the board state
+    updateView(json) {
+        console.log(json);
     }
 
     componentDidMount() {
