@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
-// import Board from './components/Board';
-import ChessBoard from './ChessBoard';
+import Board from './components/Board';
+// import ChessBoard from './ChessBoard';
 
 export default class App extends React.Component {
   constructor() {
@@ -10,8 +10,8 @@ export default class App extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-      <ChessBoard/>
-        {/* <Board/> */}
+      {/* <ChessBoard/> */}
+        <Board/>
       </View>
     );
   }

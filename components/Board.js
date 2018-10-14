@@ -17,13 +17,20 @@ export default class Board extends React.Component {
         super();
         this.state = {
             gameState: null,
-            clicked: false
+            clicked: false,
+            storedIndex: null,
         }
         this.handleCellPress = this.handleCellPress.bind(this)
     }
 
     handleCellPress(index){
-        console.log("You pressed "+index)
+        if (this.state.clicked === false) {
+            this.setState({ 
+                clicked: true,
+                storedIndex: index});
+        } else {
+            fetch('https://ghost-chess.herokuapp.com/getGameState');
+        }
     }
 
     componentDidMount() {
@@ -44,14 +51,5 @@ export default class Board extends React.Component {
             </StyledBoard>
         )
     }
-
-    handlePress(cell) {
-        if (clicked === false) {
-            clicked = true;
-        } else {
-            fetch('https://ghost-chess.herokuapp.com/getGameState')
-        }
-    }
-
 
 }
