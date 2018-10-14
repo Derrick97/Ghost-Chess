@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View } from 'react-native';
+import {Text, View} from 'react-native';
 import Cell from './Cell';
 import styled from 'styled-components';
 
@@ -11,7 +11,7 @@ const StyledBoard = styled.View`
 `;
 
 export default class Board extends React.Component {
-    
+
 
     constructor() {
         super();
@@ -21,40 +21,44 @@ export default class Board extends React.Component {
             storedIndex: null,
         }
         this.handleCellPress = this.handleCellPress.bind(this)
-        this.updateView = this.updateView.bind(this)
+        // this.updateView = this.updateView.bind(this)
     }
 
-    handleCellPress(index){
-        if (this.state.clicked === false) {
-            this.setState({ 
-                clicked: true,
-                storedIndex: index});
-        } else {
-            var body = {
-                firstIndex: this.state.storedIndex,
-                secondIndex: index
-            };
-            fetch('https://ghost-chess.herokuapp.com/getGameState', {
-                method: 'POST', 
-                body: JSON.stringify(body),
-            })
-            .then(res => res.json)
-            .then(json => updateView(json));
-            this.setState({
-                clicked: false,
-            })
-        }
+    handleCellPress(index) {
+
+            if (this.state.clicked === false) {
+                if (this.state.gameState[index].piece !== null) {
+                    this.setState({
+                        clicked: true,
+                        storedIndex: index
+                    });
+                }
+            } else {
+                var body = {
+                    firstIndex: this.state.storedIndex,
+                    secondIndex: index
+                };
+                fetch('https://ghost-chess.herokuapp.com/makeMove', {
+                    method: 'POST',
+                    body: JSON.stringify(body),
+                })
+                    .then(res => res.json)
+                    .then(json => this.setState({gameState: json}));
+                this.setState({
+                    clicked: false,
+                })
+            }
     }
 
     //To use the JSON object returned from the server and update the board state
-    updateView(json) {
-        console.log(json);
-    }
+    // updateView(json) {
+    //     this.setState({gameState: json})
+    // }
 
     componentDidMount() {
         fetch('https://ghost-chess.herokuapp.com/getGameState')
             .then(res => res.json())
-            .then(json => this.setState({ gameState: json }));
+            .then(json => this.setState({gameState: json}));
     }
 
     render() {
@@ -63,7 +67,8 @@ export default class Board extends React.Component {
                 {
                     this.state.gameState &&
                     this.state.gameState.map((cell, index) => {
-                        return(<Cell key={index} id={index} handleCellPress={this.handleCellPress} col={cell.col} row={cell.row} piece={cell.piece}/>);
+                        return (<Cell key={index} id={index} handleCellPress={this.handleCellPress} col={cell.col}
+                                      row={cell.row} piece={cell.piece}/>);
                     })
                 }
             </StyledBoard>
