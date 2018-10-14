@@ -13,13 +13,18 @@ const StyledBoard = styled.View`
 export default class Board extends React.Component {
     constructor() {
         super();
+        this.handleCellPress = this.handleCellPress.bind(this)
         this.state = {gameState: null}
+    }
+
+    handleCellPress(index){
+        console.log(index)
     }
 
     componentDidMount() {
         fetch('https://ghost-chess.herokuapp.com/getGameState')
             .then(res => res.json())
-            .then(json => this.setState({ gameState: json }));
+            .then(json => this.setState({ gameState: json[0] }));
     }
 
     render() {
@@ -28,7 +33,7 @@ export default class Board extends React.Component {
                 {
                     this.state.gameState &&
                     this.state.gameState.map((cell, index) => {
-                        return(<Cell key={index} col={cell.col} row={cell.row} piece={cell.piece}/>);
+                        return(<Cell key={index} id={index} handleCellPress={this.handleCellPress} col={cell.col} row={cell.row} piece={cell.piece}/>);
                     })
                 }
             </StyledBoard>
