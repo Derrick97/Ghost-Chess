@@ -41,7 +41,7 @@ export default class Board extends React.Component {
             };
             fetch('https://ghost-chess.herokuapp.com/makeMove', {
                 method: 'POST',
-                body: body,
+                body: JSON.stringify(body),
             })
                 .then(res => res.json())
                 .then(json => this.setState({gameState: json}));
