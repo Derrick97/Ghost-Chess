@@ -29,7 +29,14 @@ export default class Board extends React.Component {
                 clicked: true,
                 storedIndex: index});
         } else {
-            fetch('https://ghost-chess.herokuapp.com/getGameState');
+            var body = {
+                firstIndex: this.state.storedIndex,
+                secondIndex: index
+            };
+            fetch('https://ghost-chess.herokuapp.com/getGameState', {
+                method: 'POST', 
+                body: body,
+            });
         }
     }
 
