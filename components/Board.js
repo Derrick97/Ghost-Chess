@@ -10,8 +10,6 @@ const StyledBoard = styled.View`
     justifyContent: space-between;
 `;
 
-
-
 export default class Board extends React.Component {
     
 
@@ -21,6 +19,11 @@ export default class Board extends React.Component {
             gameState: null,
             clicked: false
         }
+        this.handleCellPress = this.handleCellPress.bind(this)
+    }
+
+    handleCellPress(index){
+        console.log("You pressed "+index)
     }
 
     componentDidMount() {
@@ -35,7 +38,7 @@ export default class Board extends React.Component {
                 {
                     this.state.gameState &&
                     this.state.gameState.map((cell, index) => {
-                        return(<Cell key={index} col={cell.col} row={cell.row} piece={cell.piece}/>);
+                        return(<Cell key={index} id={index} handleCellPress={this.handleCellPress} col={cell.col} row={cell.row} piece={cell.piece}/>);
                     })
                 }
             </StyledBoard>

@@ -23,7 +23,7 @@ export default class Cell extends React.Component {
     }
 
     handlePress() {
-        console.log('Cell Pressed');
+        this.props.handleCellPress(this.props.id)
     }
 
     render() {
