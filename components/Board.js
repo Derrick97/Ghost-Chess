@@ -24,30 +24,31 @@ export default class Board extends React.Component {
         // this.updateView = this.updateView.bind(this)
     }
 
+
     handleCellPress(index) {
 
-            if (this.state.clicked === false) {
-                if (this.state.gameState[index].piece !== null) {
-                    this.setState({
-                        clicked: true,
-                        storedIndex: index
-                    });
-                }
-            } else {
-                var body = {
-                    firstIndex: this.state.storedIndex,
-                    secondIndex: index
-                };
-                fetch('https://ghost-chess.herokuapp.com/makeMove', {
-                    method: 'POST',
-                    body: JSON.stringify(body),
-                })
-                    .then(res => res.json)
-                    .then(json => this.setState({gameState: json}));
+        if (this.state.clicked === false) {
+            if (this.state.gameState[index].piece !== null) {
                 this.setState({
-                    clicked: false,
-                })
+                    clicked: true,
+                    storedIndex: index
+                });
             }
+        } else {
+            var body = {
+                firstIndex: this.state.storedIndex,
+                secondIndex: index
+            };
+            fetch('https://ghost-chess.herokuapp.com/makeMove', {
+                method: 'POST',
+                body: JSON.stringify(body),
+            })
+                .then(res => res.json)
+                .then(json => this.setState({gameState: json}));
+            this.setState({
+                clicked: false,
+            })
+        }
     }
 
     //To use the JSON object returned from the server and update the board state
