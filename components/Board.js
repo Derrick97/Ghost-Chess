@@ -18,13 +18,13 @@ export default class Board extends React.Component {
     }
 
     handleCellPress(index){
-        console.log(index)
+        console.log("You pressed "+index)
     }
 
     componentDidMount() {
         fetch('https://ghost-chess.herokuapp.com/getGameState')
             .then(res => res.json())
-            .then(json => this.setState({ gameState: json[0] }));
+            .then(json => this.setState({ gameState: json }));
     }
 
     render() {
