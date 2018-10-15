@@ -93,13 +93,19 @@ app.get('/getGameState', (req, res) => {
 // Make a move and update chessboard
 app.post('/makeMove', (req, res) => {
   console.log(req.body);
-  let firstCell = JSON.parse(redisClient.lindex('gameState', req.body.firstIndex));
-  let secondCell = JSON.parse(redisClient.lindex('gameState', req.body.secondIndex));
-  redisClient.lset('gameState', req.body.firstIndex, JSON.stringify({ col: firstCell.col, row: firstCell.row, piece: null }));
-  redisClient.lset('gameState', req.body.secondIndex, JSON.stringify({ col: secondCell.col, row: secondCell.row, piece: firstCell.piece }));
-  redisClient.lrange('gameState', 0, -1, function (err, reply) {
-    res.json(reply.map(obj => JSON.parse(obj)));
-  });
+  redisClient.lindex('gameState', req.body.firstIndex, function (err, res) {
+    console.log('first Cell: ' + res);
+    let firstCell = JSON.parse(res);
+    redisClient.lindex('gameState', req.body.secondIndex, function (err, res) {
+      console.log('second Cell: ' + res);
+      let secondCell = JSON.parse(res);
+      redisClient.lset('gameState', req.body.firstIndex, JSON.stringify({ ...firstCell, piece: null }));
+      redisClient.lset('gameState', req.body.secondIndex, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+      redisClient.lrange('gameState', 0, -1, function (err, reply) {
+        res.json(reply.map(obj => JSON.parse(obj)));
+      });
+    });
+  }); 
 });
 
 const PORT = process.env.PORT || 5000;
