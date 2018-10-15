@@ -17,9 +17,9 @@ export default class Board extends React.Component {
     super();
     this.state = {
       gameState: null,
-    }
-    this.firstIndex = null;
-    this.secondIndex = null;
+    };
+    this.startCell = null;
+    this.endCell = null;
     this.handleCellPress = this.handleCellPress.bind(this)
   }
 
@@ -31,25 +31,25 @@ export default class Board extends React.Component {
 
   handleCellPress(index) {
     // If no chess piece is selected ...
-    if (this.firstIndex === null) {
+    if (this.startCell === null) {
       if (this.state.gameState[index].piece !== null) {
         // ... set start cell to cell index
-        this.firstIndex = index;
+        this.startCell = index;
       }
     } else {
       // Otherwise, chess piece is already selected ...
-      this.secondIndex = index;
+      this.endCell = index;
       // ... Send start and end cell to server to make move
       fetch('https://ghost-chess.herokuapp.com/makeMove', {
         method: 'POST',
         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstIndex: this.firstIndex, secondIndex: this.secondIndex })
+        body: JSON.stringify({ startCell: this.startCell, endCell: this.endCell })
       })
         .then(res => res.json())
         .then(json => {
           this.setState({ gameState: json });
-          this.firstIndex = null;
-          this.secondIndex = null;
+          this.startCell = null;
+          this.endCell = null;
         });
     }
   }

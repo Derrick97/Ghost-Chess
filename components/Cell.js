@@ -28,13 +28,13 @@ export default class Cell extends React.Component {
 
   render() {
     return (
-      <StyledCell underlayColor='red' col={this.props.col} row={this.props.row} onPress={this.handlePress}>
+      <StyledCell underlayColor='grey' col={this.props.col} row={this.props.row} onPress={this.handlePress}>
         {
           this.props.piece ?
             <Text style={{ color: this.props.piece.color }}>
               {this.props.piece.type}
             </Text> :
-            <Text></Text>
+            <Text/>
         }
       </StyledCell>);
   }

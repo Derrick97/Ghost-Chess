@@ -1,8 +1,8 @@
 const express = require("express");
 const BodyParser = require("body-parser");
 const app = express();
-app.use(BodyParser.urlencoded({ extended: false }))
-app.use(BodyParser.json())
+app.use(BodyParser.urlencoded({ extended: false }));
+app.use(BodyParser.json());
 
 // Set up Redis Client
 const redisClient = require('redis').createClient(process.env.REDIS_URL);
@@ -92,12 +92,12 @@ app.get('/getGameState', (req, res) => {
 
 // Make a move and update chessboard
 app.post('/makeMove', (req, res) => {
-  redisClient.lindex('gameState', req.body.firstIndex, function (err, reply) {
+  redisClient.lindex('gameState', req.body.startCell, function (err, reply) {
     let firstCell = JSON.parse(reply);
-    redisClient.lindex('gameState', req.body.secondIndex, function (err, reply) {
+    redisClient.lindex('gameState', req.body.endCell, function (err, reply) {
       let secondCell = JSON.parse(reply);
-      redisClient.lset('gameState', req.body.firstIndex, JSON.stringify({ ...firstCell, piece: null }));
-      redisClient.lset('gameState', req.body.secondIndex, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+      redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
+      redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
       redisClient.lrange('gameState', 0, -1, function (err, reply) {
         res.json(reply.map(obj => JSON.parse(obj)));
       });
