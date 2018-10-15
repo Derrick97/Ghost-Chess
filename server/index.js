@@ -93,12 +93,12 @@ app.get('/getGameState', (req, res) => {
 // Make a move and update chessboard
 app.post('/makeMove', (req, res) => {
   console.log(req.body);
-  redisClient.lindex('gameState', req.body.firstIndex, function (err, res) {
-    console.log('first Cell: ' + res);
-    let firstCell = JSON.parse(res);
-    redisClient.lindex('gameState', req.body.secondIndex, function (err, res) {
-      console.log('second Cell: ' + res);
-      let secondCell = JSON.parse(res);
+  redisClient.lindex('gameState', req.body.firstIndex, function (err, reply) {
+    console.log('first Cell: ' + reply);
+    let firstCell = JSON.parse(reply);
+    redisClient.lindex('gameState', req.body.secondIndex, function (err, reply) {
+      console.log('second Cell: ' + reply);
+      let secondCell = JSON.parse(reply);
       redisClient.lset('gameState', req.body.firstIndex, JSON.stringify({ ...firstCell, piece: null }));
       redisClient.lset('gameState', req.body.secondIndex, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
       redisClient.lrange('gameState', 0, -1, function (err, reply) {
