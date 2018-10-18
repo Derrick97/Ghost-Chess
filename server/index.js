@@ -96,8 +96,21 @@ app.post('/makeMove', (req, res) => {
     let firstCell = JSON.parse(reply);
     redisClient.lindex('gameState', req.body.endCell, function (err, reply) {
       let secondCell = JSON.parse(reply);
-      redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
-      redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+      if ( firstCell.piece !== null && secondCell.piece === null ){
+        var validMove;
+        switch( firstCell.piece.type ) {
+            case "P":
+            //validMove = validatePawn
+            validMove = true;
+            break;
+            default:
+            console.log('Error Piece Detected');
+          }
+        if (validMove){
+          redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
+          redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+        }
+      }
       redisClient.lrange('gameState', 0, -1, function (err, reply) {
         res.json(reply.map(obj => JSON.parse(obj)));
       });
