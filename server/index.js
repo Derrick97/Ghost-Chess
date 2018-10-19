@@ -10,14 +10,14 @@ redisClient.on('connect', () => console.log('Redis client connected'));
 redisClient.on('error', err => console.log('Redis client error: ' + err));
 redisClient.flushall(function (err, res) {
   const gameState = [
-    { col: 0, row: 0, piece: null },
-    { col: 1, row: 0, piece: null },
-    { col: 2, row: 0, piece: null },
-    { col: 3, row: 0, piece: null },
-    { col: 4, row: 0, piece: { type: 'P', color: 'white' } },
-    { col: 5, row: 0, piece: null },
-    { col: 6, row: 0, piece: null },
-    { col: 7, row: 0, piece: null },
+    { col: 0, row: 0, piece: { type: 'K', color: 'white' } },
+    { col: 1, row: 0, piece: { type: 'Q', color: 'white' } },
+    { col: 2, row: 0, piece: { type: 'R', color: 'white' } },
+    { col: 3, row: 0, piece: { type: 'H', color: 'white' } },
+    { col: 4, row: 0, piece: { type: 'B', color: 'white' } },
+    { col: 5, row: 0, piece: { type: 'P', color: 'white' } },
+    { col: 6, row: 0, piece: null},
+    { col: 7, row: 0, piece: null},
     { col: 0, row: 1, piece: null },
     { col: 1, row: 1, piece: null },
     { col: 2, row: 1, piece: null },
