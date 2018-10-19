@@ -15,7 +15,7 @@ redisClient.flushall(function (err, res) {
     { col: 2, row: 0, piece: { type: 'R', color: 'white' } },
     { col: 3, row: 0, piece: { type: 'H', color: 'white' } },
     { col: 4, row: 0, piece: { type: 'B', color: 'white' } },
-    { col: 5, row: 0, piece: { type: 'P', color: 'white' } },
+    { col: 5, row: 0, piece: null },
     { col: 6, row: 0, piece: null},
     { col: 7, row: 0, piece: null},
     { col: 0, row: 1, piece: null },
@@ -24,8 +24,8 @@ redisClient.flushall(function (err, res) {
     { col: 3, row: 1, piece: null },
     { col: 4, row: 1, piece: null },
     { col: 5, row: 1, piece: null },
-    { col: 6, row: 1, piece: null },
-    { col: 7, row: 1, piece: null },
+    { col: 6, row: 1, piece: { type: 'P', color: 'white' } },
+    { col: 7, row: 1, piece: { type: 'P', color: 'white' } },
     { col: 0, row: 2, piece: null },
     { col: 1, row: 2, piece: null },
     { col: 2, row: 2, piece: null },
@@ -64,13 +64,13 @@ redisClient.flushall(function (err, res) {
     { col: 3, row: 6, piece: null },
     { col: 4, row: 6, piece: null },
     { col: 5, row: 6, piece: null },
-    { col: 6, row: 6, piece: null },
-    { col: 7, row: 6, piece: null },
-    { col: 0, row: 7, piece: null },
-    { col: 1, row: 7, piece: null },
-    { col: 2, row: 7, piece: null },
-    { col: 3, row: 7, piece: null },
-    { col: 4, row: 7, piece: null },
+    { col: 6, row: 6, piece: { type: 'P', color: 'black' } },
+    { col: 7, row: 6, piece: { type: 'P', color: 'black' } },
+    { col: 0, row: 7, piece: { type: 'K', color: 'black' } },
+    { col: 1, row: 7, piece: { type: 'Q', color: 'black' } },
+    { col: 2, row: 7, piece: { type: 'R', color: 'black' } },
+    { col: 3, row: 7, piece: { type: 'H', color: 'black' } },
+    { col: 4, row: 7, piece: { type: 'B', color: 'black' } },
     { col: 5, row: 7, piece: null },
     { col: 6, row: 7, piece: null },
     { col: 7, row: 7, piece: null },
@@ -105,8 +105,13 @@ app.post('/makeMove', (req, res) => {
         let sCol = secondCell.col;
         switch( firstCell.piece.type ) {
             case "P": //Pawn.
+                if(firstCell.piece.color === "white"){
 
-            validMove = true;
+                } else {
+
+                }
+
+
             break;
             case "H": //Horse.
               if(fRow - sRow === 2 || sRow - fRow === 2 ){
