@@ -103,6 +103,8 @@ app.post('/makeMove', (req, res) => {
         let fCol = firstCell.col;
         let sRow = secondCell.row;
         let sCol = secondCell.col;
+        let curRow = fRow;
+        let curCol = fCol;
         switch( firstCell.piece.type ) {
             case "P": //Pawn.
                 if(firstCell.piece.color === "white"){
@@ -124,8 +126,6 @@ app.post('/makeMove', (req, res) => {
               }
               break;
             case "B": //Bishop.
-              let curRow = fRow;
-              let curCol = fCol;
               while (curRow <= 7 && curCol <= 7) {
                 if (curRow === sRow && curCol === sCol) {
                   validMove = true;
@@ -162,8 +162,6 @@ app.post('/makeMove', (req, res) => {
               } 
               break;
             case "R": //Rook.
-              let curRow = fRow;
-              let curCol = fCol;
               while (curRow <= 7) {
                 if (curRow === sRow && curCol === sCol) {
                   validMove = true;
@@ -197,8 +195,6 @@ app.post('/makeMove', (req, res) => {
               break;
             default:
             console.log('Error Piece Detected');
-
-
           }
         if (validMove){
           redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
