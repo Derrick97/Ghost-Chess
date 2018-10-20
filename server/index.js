@@ -96,7 +96,7 @@ app.post('/makeMove', (req, res) => {
     let firstCell = JSON.parse(reply);
     redisClient.lindex('gameState', req.body.endCell, function (err, reply) {
       let secondCell = JSON.parse(reply);
-      if ( firstCell.piece !== null){
+      if (firstCell.piece !== null){
         let validMove = false;
         // Initialize validity as false. If the condition is met, change it to true.
         let fRow = firstCell.row;
@@ -107,28 +107,28 @@ app.post('/makeMove', (req, res) => {
         let curCol = fCol;
         switch( firstCell.piece.type ) {
             case "P": //Pawn.
-                if(firstCell.piece.color === "white"){
-                  if (secondCell.piece.color === "black") {
-                    if ((fCol === sCol - 1 || fCol === sCol + 1) && fRow === sRow + 1) {
-                      validMove = true;
-                    }
-                  } else if (secondCell.piece === null) {
-                    if (fCol === sCol && fRow === sRow + 1) {
-                      validMove = true;
-                    }
+              if(firstCell.piece.color === "white"){
+                if (secondCell.piece.color === "black") {
+                  if ((fCol === sCol - 1 || fCol === sCol + 1) && fRow === sRow - 1) {
+                    validMove = true;
                   }
-                } else if (firstCell.piece.color === "black") {
-                  if (secondCell.piece.color === "white") {
-                    if ((fCol === sCol - 1 || fCol === sCol + 1) && fRow === sRow - 1) {
-                      validMove = true;
-                    }
-                  } else if (secondCell.piece === null) {
-                    if (fCol === sCol && fRow === sRow - 1) {
-                      validMove = true;
-                    }
+                } else if (secondCell.piece === null) {
+                  if (fCol === sCol && fRow === sRow - 1) {
+                    validMove = true;
                   }
                 }
-            break;
+              } else if (firstCell.piece.color === "black") {
+                if (secondCell.piece.color === "white") {
+                  if ((fCol === sCol - 1 || fCol === sCol + 1) && fRow === sRow + 1) {
+                    validMove = true;
+                  }
+                } else if (secondCell.piece === null) {
+                  if (fCol === sCol && fRow === sRow + 1) {
+                    validMove = true;
+                  }
+                }
+              }
+              break;
             case "H": //Horse.
               if(fRow - sRow === 2 || sRow - fRow === 2 ){
                 if(fCol - sCol === 1 || sCol - fCol === 1){
