@@ -20,6 +20,7 @@ export default class Cell extends React.Component {
   constructor() {
     super();
     this.handlePress = this.handlePress.bind(this);
+    this.renderChessPiece = this.renderChessPiece.bind(this);
   }
 
   handlePress() {
@@ -27,29 +28,30 @@ export default class Cell extends React.Component {
   }
 
   renderChessPiece() {
-    let chessCode;
-    if (this.props.piece.color === 'white') {
-      chessCode = 0;
+    let chessCode = 0;
+    if (this.props.piece.color === "black") {
+      chessCode = 6;
     }
     switch (this.props.piece.type) {
-      case 'K':
+      case "K":
         chessCode += 9812;
         break;
-      case 'Q':
+      case "Q":
         chessCode += 9813;
         break;
-      case 'R': 
+      case "R": 
         chessCode += 9814;
         break;
-      case 'B': 
+      case "B": 
         chessCode += 9815;
         break;
-      case 'H': 
+      case "H": 
         chessCode += 9816;
         break;
-      case 'P': 
+      case "P": 
         chessCode += 9817;
         break;
+      default:
     }
     return chessCode;
   }
