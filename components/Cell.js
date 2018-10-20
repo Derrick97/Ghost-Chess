@@ -28,7 +28,7 @@ export default class Cell extends React.Component {
   }
 
   renderChessPiece() {
-    let chessCode = 0;
+    var chessCode = 0;
     if (this.props.piece.color === "black") {
       chessCode = 6;
     }
@@ -52,6 +52,7 @@ export default class Cell extends React.Component {
         chessCode += 9817;
         break;
       default:
+        chessCode = 9812;
     }
     return chessCode;
   }
@@ -62,7 +63,7 @@ export default class Cell extends React.Component {
         {
           this.props.piece ?
             <Text style={{ color: this.props.piece.color }}>
-              {String.fromCharCode(this.renderChessPiece)}
+              {String.fromCharCode(this.renderChessPiece())}
             </Text> :
             <Text/>
         }
