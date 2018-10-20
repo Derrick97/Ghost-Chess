@@ -111,7 +111,6 @@ app.post('/makeMove', (req, res) => {
 
                 }
 
-
             break;
             case "H": //Horse.
               if(fRow - sRow === 2 || sRow - fRow === 2 ){
@@ -123,6 +122,44 @@ app.post('/makeMove', (req, res) => {
                   validMove = true
                 }
               }
+              break;
+            case "B": //Bishop.
+              let curRow = fRow;
+              let curCol = fCol;
+              while (curRow <= 7 && curCol <= 7) {
+                if (curRow === sRow && curCol === sCol) {
+                  validMove = true;
+                }
+                curRow += 1;
+                curCol += 1;
+              }
+              curRow = fRow;
+              curCol = fCol;
+              while (curRow >= 0 && curCol >= 0) {
+                if (curRow === sRow && curCol === sCol) {
+                  validMove = true;
+                }
+                curRow -= 1;
+                curCol -= 1;
+              }
+              curRow = fRow;
+              curCol = fCol;
+              while (curRow <= 7 && curCol >= 0) {
+                if (curRow === sRow && curCol === sCol) {
+                  validMove = true;
+                }
+                curRow += 1;
+                curCol -= 1;
+              } 
+              curRow = fRow;
+              curCol = fCol;
+              while (curRow >= 0 && curCol <= 7) {
+                if (curRow === sRow && curCol === sCol) {
+                  validMove = true;
+                }
+                curRow -= 1;
+                curCol += 1;
+              } 
               break;
             default:
             console.log('Error Piece Detected');
