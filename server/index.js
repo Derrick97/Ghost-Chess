@@ -107,27 +107,27 @@ app.post('/makeMove', (req, res) => {
         let curCol = fCol;
         switch( firstCell.piece.type ) {
             case "P": //Pawn.
-              // if(firstCell.piece.color === "white"){
-              //   if (secondCell.piece === null) {
-              //     if (fCol === sCol && fRow + 1 === sRow) {
-              //       validMove = true;
-              //   } else if (secondCell.piece.color === "black") {
-              //       if ((sCol === fCol + 1 || sCol === fCol - 1) && fRow + 1 === sRow) {
-              //         validMove = true;
-              //       }
-              //     } 
-              //   }
-              // } else if (firstCell.piece.color === "black") {
-              //   if (secondCell.piece === null) {
-              //     if (fCol === sCol && fRow === sRow + 1) {
-              //       validMove = true;
-              //     }
-              //   } else if (secondCell.piece.color === "white") {
-              //     if ((fCol === sCol - 1 || fCol === sCol + 1) && fRow === sRow + 1) {
-              //       validMove = true;
-              //     }
-              //   }  
-              // }
+              if(firstCell.piece.color === "white"){
+                if (secondCell.piece === null) {
+                  if (fCol === sCol && fRow + 1 === sRow) {
+                    validMove = true;
+                } else if (secondCell.piece.color === "black") {
+                    if ((sCol === fCol + 1 || sCol === fCol - 1) && fRow + 1 === sRow) {
+                      validMove = true;
+                    }
+                  } 
+                }
+              } else if (firstCell.piece.color === "black") {
+                if (secondCell.piece === null) {
+                  if (fCol === sCol && fRow === sRow + 1) {
+                    validMove = true;
+                  }
+                } else if (secondCell.piece.color === "white") {
+                  if ((fCol === sCol - 1 || fCol === sCol + 1) && fRow === sRow + 1) {
+                    validMove = true;
+                  }
+                }  
+              }
               break;
             case "H": //Horse.
               if(fRow - sRow === 2 || sRow - fRow === 2 ){
