@@ -161,6 +161,40 @@ app.post('/makeMove', (req, res) => {
                 curCol += 1;
               } 
               break;
+            case "R": //Rook.
+              let curRow = fRow;
+              let curCol = fCol;
+              while (curRow <= 7) {
+                if (curRow === sRow && curCol === sCol) {
+                  validMove = true;
+                }
+                curRow += 1;
+              }
+              curRow = fRow;
+              curCol = fCol;
+              while (curRow >= 0 ) {
+                if (curRow === sRow && curCol === sCol) {
+                  validMove = true;
+                }
+                curRow -= 1;
+              }
+              curRow = fRow;
+              curCol = fCol;
+              while (curCol >= 0) {
+                if (curRow === sRow && curCol === sCol) {
+                  validMove = true;
+                }
+                curCol -= 1;
+              } 
+              curRow = fRow;
+              curCol = fCol;
+              while (curCol <= 7) {
+                if (curRow === sRow && curCol === sCol) {
+                  validMove = true;
+                }
+                curCol += 1;
+              } 
+              break;
             default:
             console.log('Error Piece Detected');
 
