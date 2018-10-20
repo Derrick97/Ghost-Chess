@@ -32,7 +32,7 @@ export default class Cell extends React.Component {
         {
           this.props.piece ?
             <Text style={{ color: this.props.piece.color }}>
-              {this.props.piece.type}
+              {String.fromCharCode(9812)}
             </Text> :
             <Text/>
         }
