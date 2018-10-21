@@ -10,22 +10,22 @@ redisClient.on('connect', () => console.log('Redis client connected'));
 redisClient.on('error', err => console.log('Redis client error: ' + err));
 redisClient.flushall(function (err, res) {
     const gameState = [
-        {col: 0, row: 0, piece: {type: 'K', color: 'white'}},
-        {col: 1, row: 0, piece: {type: 'Q', color: 'white'}},
-        {col: 2, row: 0, piece: {type: 'R', color: 'white'}},
-        {col: 3, row: 0, piece: {type: 'H', color: 'white'}},
-        {col: 4, row: 0, piece: {type: 'B', color: 'white'}},
-        {col: 5, row: 0, piece: null},
-        {col: 6, row: 0, piece: null},
-        {col: 7, row: 0, piece: null},
-        {col: 0, row: 1, piece: null},
+        {col: 0, row: 0, piece: {type: 'R', color: 'white'}},
+        {col: 1, row: 0, piece: {type: 'H', color: 'white'}},
+        {col: 2, row: 0, piece: {type: 'B', color: 'white'}},
+        {col: 3, row: 0, piece: {type: 'K', color: 'white'}},
+        {col: 4, row: 0, piece: {type: 'Q', color: 'white'}},
+        {col: 5, row: 0, piece: {type: 'B', color: 'white'}},
+        {col: 6, row: 0, piece: {type: 'H', color: 'white'}},
+        {col: 7, row: 0, piece: {type: 'R', color: 'white'}},
+        {col: 0, row: 1, piece: {type: 'P', color: 'white'}},
         {col: 1, row: 1, piece: null},
         {col: 2, row: 1, piece: null},
         {col: 3, row: 1, piece: null},
         {col: 4, row: 1, piece: null},
         {col: 5, row: 1, piece: null},
-        {col: 6, row: 1, piece: {type: 'P', color: 'white'}},
-        {col: 7, row: 1, piece: {type: 'P', color: 'white'}},
+        {col: 6, row: 1, piece: null},
+        {col: 7, row: 1, piece: null},
         {col: 0, row: 2, piece: null},
         {col: 1, row: 2, piece: null},
         {col: 2, row: 2, piece: null},
@@ -58,22 +58,22 @@ redisClient.flushall(function (err, res) {
         {col: 5, row: 5, piece: null},
         {col: 6, row: 5, piece: null},
         {col: 7, row: 5, piece: null},
-        {col: 0, row: 6, piece: null},
+        {col: 0, row: 6, piece: {type: 'P', color: 'black'}},
         {col: 1, row: 6, piece: null},
         {col: 2, row: 6, piece: null},
         {col: 3, row: 6, piece: null},
         {col: 4, row: 6, piece: null},
         {col: 5, row: 6, piece: null},
-        {col: 6, row: 6, piece: {type: 'P', color: 'black'}},
-        {col: 7, row: 6, piece: {type: 'P', color: 'black'}},
-        {col: 0, row: 7, piece: {type: 'K', color: 'black'}},
-        {col: 1, row: 7, piece: {type: 'Q', color: 'black'}},
-        {col: 2, row: 7, piece: {type: 'R', color: 'black'}},
-        {col: 3, row: 7, piece: {type: 'H', color: 'black'}},
-        {col: 4, row: 7, piece: {type: 'B', color: 'black'}},
-        {col: 5, row: 7, piece: null},
-        {col: 6, row: 7, piece: null},
-        {col: 7, row: 7, piece: null},
+        {col: 6, row: 6, piece: null},
+        {col: 7, row: 6, piece: null},
+        {col: 0, row: 7, piece: {type: 'R', color: 'black'}},
+        {col: 1, row: 7, piece: {type: 'H', color: 'black'}},
+        {col: 2, row: 7, piece: {type: 'B', color: 'black'}},
+        {col: 3, row: 7, piece: {type: 'K', color: 'black'}},
+        {col: 4, row: 7, piece: {type: 'Q', color: 'black'}},
+        {col: 5, row: 7, piece: {type: 'B', color: 'black'}},
+        {col: 6, row: 7, piece: {type: 'H', color: 'black'}},
+        {col: 7, row: 7, piece: {type: 'R', color: 'black'}},
     ];
     redisClient.rpush("gameState", gameState.map(obj => JSON.stringify(obj)));
 });
@@ -123,7 +123,7 @@ function validateMove(firstCell, secondCell) {
     // TODO: modify logic for piece capture
     if (secondCell.piece !== null) return false;
     // Check the two cells are different
-    if (firstCell.col == secondCell.col && firstCell.row == secondCell.row) return false;
+    if (firstCell.col === secondCell.col && firstCell.row === secondCell.row) return false;
 
     // Initailize isValidMove to false
     let isValidMove = false;
@@ -145,7 +145,7 @@ function validateMove(firstCell, secondCell) {
             break;
         case 'P':
             isValidMove = validatePawn(firstCell, secondCell);
-            break
+            break;
         default:
             console.log('Error Piece Detected');
     }
@@ -165,24 +165,24 @@ function validateQueen(firstCell, secondCell) {
 
 function validateBishop(firstCell, secondCell) {
     // A move from (C1, R1) to (C2, R2) is valid iff |C1-C2| == |R1-R2|
-    return Math.abs(firstCell.col - secondCell.col) == Math.abs(firstCell.row - secondCell.row);
+    return Math.abs(firstCell.col - secondCell.col) === Math.abs(firstCell.row - secondCell.row);
 }
 
 function validateHorse(firstCell, secondCell) {
     // A move from (C1, R1) to (C2, R2) is valid iff
     // |C1-C2| == 1 and |R1-R2| == 2  OR |C1-C2| == 2 and |R1-R2| == 1
-    return (Math.abs(firstCell.col - secondCell.col) == 1 && Math.abs(firstCell.row - secondCell.row) == 2) ||
-    (Math.abs(firstCell.col - secondCell.col) == 2 && Math.abs(firstCell.row - secondCell.row) == 1);
+    return (Math.abs(firstCell.col - secondCell.col) === 1 && Math.abs(firstCell.row - secondCell.row) === 2) ||
+    (Math.abs(firstCell.col - secondCell.col) === 2 && Math.abs(firstCell.row - secondCell.row) === 1);
 }
 
 function validateRoot(firstCell, secondCell) {
     // A move from (C1, R1) to (C2, R2) is valid iff C1 == C2 or R1 == R2
-    return firstCell.col == secondCell.col || firstCell.row == secondCell.row;
+    return firstCell.col === secondCell.col || firstCell.row === secondCell.row;
 }
 
 function validatePawn(firstCell, secondCell) {
     // TODO: Change logic so pawn can only move forward
-    return (firstCell.col == secondCell.col) && Math.abs(firstCell.row -  secondCell.row) == 1;
+    return (firstCell.col === secondCell.col) && Math.abs(firstCell.row -  secondCell.row) === 1;
 }
 
 /*

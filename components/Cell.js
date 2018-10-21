@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import styled from 'styled-components';
 
 const backgroundColor = ({ col, row }) => {
-  return (col + row) % 2 === 0 ? '#0F984A' : '#5AF29B';
+  return (col + row) % 2 === 1 ? '#0F984A' : '#5AF29B';
 };
 
 const StyledCell = styled.TouchableHighlight`
@@ -15,57 +15,53 @@ const StyledCell = styled.TouchableHighlight`
     alignItems: center;
 `;
 
+const StyledPiece = styled.Text`
+    font-size: 20;
+`;
+
+function Piece(props) {
+    let chessCode = props.color === "black" ? 6 : 0;
+    switch (props.type) {
+        case "K":
+            chessCode += 9812;
+            break;
+        case "Q":
+            chessCode += 9813;
+            break;
+        case "R":
+            chessCode += 9814;
+            break;
+        case "B":
+            chessCode += 9815;
+            break;
+        case "H":
+            chessCode += 9816;
+            break;
+        case "P":
+            chessCode += 9817;
+            break;
+        default:
+            chessCode = 9812;
+    }
+    return <StyledPiece>{String.fromCharCode(chessCode)}</StyledPiece>
+}
+
 export default class Cell extends React.Component {
 
   constructor() {
     super();
     this.handlePress = this.handlePress.bind(this);
-    this.renderChessPiece = this.renderChessPiece.bind(this);
   }
 
   handlePress() {
     this.props.handleCellPress(this.props.id)
   }
 
-  renderChessPiece() {
-    var chessCode = 0;
-    if (this.props.piece.color === "black") {
-      chessCode = 6;
-    }
-    switch (this.props.piece.type) {
-      case "K":
-        chessCode += 9812;
-        break;
-      case "Q":
-        chessCode += 9813;
-        break;
-      case "R": 
-        chessCode += 9814;
-        break;
-      case "B": 
-        chessCode += 9815;
-        break;
-      case "H": 
-        chessCode += 9816;
-        break;
-      case "P": 
-        chessCode += 9817;
-        break;
-      default:
-        chessCode = 9812;
-    }
-    return chessCode;
-  }
-
   render() {
     return (
       <StyledCell underlayColor='grey' col={this.props.col} row={this.props.row} onPress={this.handlePress}>
         {
-          this.props.piece ?
-            <Text style={{ color: this.props.piece.color }}>
-              {String.fromCharCode(this.renderChessPiece())}
-            </Text> :
-            <Text/>
+          this.props.piece ? <Piece color={this.props.piece.color} type={this.props.piece.type}/> : <Text/>
         }
       </StyledCell>);
   }
