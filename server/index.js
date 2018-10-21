@@ -197,9 +197,9 @@ function validatePawn(firstCell, secondCell) {
     } else {
         //The piece is black, on starting row
         if(firstCell.row === 6){
-            return sameCol && (firstCell.row > secondCell.row) && (moveOne || moveTwo);
+            return sameCol && (secondCell.row < firstCell.row) && (moveOne || moveTwo);
         }
-        return sameCol && (secondCell.row > firstCell.row) && moveOne;
+        return sameCol && (secondCell.row < firstCell.row) && moveOne;
     }
 }
 
