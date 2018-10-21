@@ -96,144 +96,13 @@ app.post('/makeMove', (req, res) => {
         let firstCell = JSON.parse(reply);
         redisClient.lindex('gameState', req.body.endCell, function (err, reply) {
             let secondCell = JSON.parse(reply);
-            if (firstCell.piece !== null) {
-                let validMove = false;
-                // Initialize validity as false. If the condition is met, change it to true.
-                let fRow = firstCell.row;
-                let fCol = firstCell.col;
-                let sRow = secondCell.row;
-                let sCol = secondCell.col;
-                let curRow = fRow;
-                let curCol = fCol;
-                switch (firstCell.piece.type) {
-                    case "K":
-                        if (fRow - sRow === 1 || sRow - fRow === 1) {
-                            if (fCol - sCol === 1 || sCol - fCol === 1) {
-                                validMove = true;
-                            }
-                        }
-                        validMove = true;
-                        break;
-                    // case "P": //Pawn.
-                    //   if(firstCell.piece.color === "white"){
-                    //     if (secondCell.piece === null) {
-                    //       if (fCol === sCol && fRow + 1 === sRow) {
-                    //         validMove = true;
-                    //     } else if (secondCell.piece.color === "black") {
-                    //         if ((sCol === fCol + 1 || sCol === fCol - 1) && fRow + 1 === sRow) {
-                    //           validMove = true;
-                    //         }
-                    //       }
-                    //     }
-                    //   } else if (firstCell.piece.color === "black") {
-                    //     if (secondCell.piece === null) {
-                    //       if (fCol === sCol && fRow === sRow + 1) {
-                    //         validMove = true;
-                    //       }
-                    //     } else if (secondCell.piece.color === "white") {
-                    //       if ((fCol === sCol - 1 || fCol === sCol + 1) && fRow === sRow + 1) {
-                    //         validMove = true;
-                    //       }
-                    //     }
-                    //   }
-                    //   break;
-                    case "H": //Horse.
-                        if (fRow - sRow === 2 || sRow - fRow === 2) {
-                            if (fCol - sCol === 1 || sCol - fCol === 1) {
-                                validMove = true;
-                            }
-                        } else if (fRow - sRow === 1 || sRow - fRow === 1) {
-                            if (fCol - sCol === 2 || sCol - fCol === 2) {
-                                validMove = true
-                            }
-                        }
-                        break;
-                    case "B": //Bishop.
-                        while (curRow <= 7 && curCol <= 7) {
-                            if (curRow === sRow && curCol === sCol) {
-                                validMove = true;
-                            }
-                            curRow += 1;
-                            curCol += 1;
-                        }
-                        curRow = fRow;
-                        curCol = fCol;
-                        while (curRow >= 0 && curCol >= 0) {
-                            if (curRow === sRow && curCol === sCol) {
-                                validMove = true;
-                            }
-                            curRow -= 1;
-                            curCol -= 1;
-                        }
-                        curRow = fRow;
-                        curCol = fCol;
-                        while (curRow <= 7 && curCol >= 0) {
-                            if (curRow === sRow && curCol === sCol) {
-                                validMove = true;
-                            }
-                            curRow += 1;
-                            curCol -= 1;
-                        }
-                        curRow = fRow;
-                        curCol = fCol;
-                        while (curRow >= 0 && curCol <= 7) {
-                            if (curRow === sRow && curCol === sCol) {
-                                validMove = true;
-                            }
-                            curRow -= 1;
-                            curCol += 1;
-                        }
-                        break;
-                    case "R": //Rook.
-                        while (curRow <= 7) {
-                            if (curRow === sRow && curCol === sCol) {
-                                validMove = true;
-                            }
-                            curRow += 1;
-                        }
-                        curRow = fRow;
-                        curCol = fCol;
-                        while (curRow >= 0) {
-                            if (curRow === sRow && curCol === sCol) {
-                                validMove = true;
-                            }
-                            curRow -= 1;
-                        }
-                        curRow = fRow;
-                        curCol = fCol;
-                        while (curCol >= 0) {
-                            if (curRow === sRow && curCol === sCol) {
-                                validMove = true;
-                            }
-                            curCol -= 1;
-                        }
-                        curRow = fRow;
-                        curCol = fCol;
-                        while (curCol <= 7) {
-                            if (curRow === sRow && curCol === sCol) {
-                                validMove = true;
-                            }
-                            curCol += 1;
-                        }
-                        break;
-                    default:
-                        console.log('Error Piece Detected');
-                }
-                if (validMove && secondCell.piece === null) {
-                    redisClient.lset('gameState', req.body.startCell, JSON.stringify({...firstCell, piece: null}));
-                    redisClient.lset('gameState', req.body.endCell, JSON.stringify({
-                        ...secondCell,
-                        piece: firstCell.piece
-                    }));
-                } else if (validMove && (secondCell.piece !== null)) {
-                    if (firstCell.piece.color !== secondCell.piece.color) {
-                        redisClient.lset('gameState', req.body.startCell, JSON.stringify({...firstCell, piece: null}));
-                        redisClient.lset('gameState', req.body.endCell, JSON.stringify({
-                            ...secondCell,
-                            piece: firstCell.piece
-                        }));
-                    }
-                }
+
+            let validMove = validateMove(firstCell, secondCell);
+
+            // Update move if move is valid
+            if (validMove) {
+                redisClient.lset('gameState', req.body.startCell, JSON.stringify({...firstCell, piece: null}));
+                redisClient.lset('gameState', req.body.endCell, JSON.stringify({...secondCell, piece: firstCell.piece }));
             }
             redisClient.lrange('gameState', 0, -1, function (err, reply) {
                 res.json(reply.map(obj => JSON.parse(obj)));
@@ -246,3 +115,210 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, function () {
     console.log(`App listening on port ${PORT}`);
 });
+
+function validateMove(firstCell, secondCell) {
+    // Check first cell contains piece
+    if (firstCell.piece == null) return false;
+    // Check second cell does not contain piece.
+    // TODO: modify logic for piece capture
+    if (secondCell.piece !== null) return false;
+    // Check the two cells are different
+    if (firstCell.col == secondCell.col && firstCell.row == secondCell.row) return false;
+
+    // Initailize isValidMove to false
+    let isValidMove = false;
+    switch (firstCell.piece.type) {
+        case 'K': // King
+            isValidMove = validateKing(firstCell, secondCell);
+            break;
+        case 'Q': // Queen
+            isValidMove = validateQueen(firstCell, secondCell);
+            break;
+        case 'B': // Bishop
+            isValidMove = validateBishop(firstCell, secondCell);
+            break;
+        case 'H': // Horse
+            isValidMove = validateHorse(firstCell, secondCell);
+            break;
+        case 'R': // Root
+            isValidMove = validateRoot(firstCell, secondCell);
+            break;
+        case 'P':
+            isValidMove = validatePawn(firstCell, secondCell);
+            break
+        default:
+            console.log('Error Piece Detected');
+    }
+    return isValidMove;
+}
+
+function validateKing(firstCell, secondCell) {
+    // A move from (C1, R1) to (C2, R2) is valid iff |C1-C2| <= 1 and |R1-R2| <= 1
+    return Math.abs(firstCell.col - secondCell.col) <= 1 &&
+    Math.abs(firstCell.row - secondCell.row) <= 1
+}
+
+function validateQueen(firstCell, secondCell) {
+    // A move is valid if it is a valid move for root or valid move for bishop
+    return validateRoot(firstCell, secondCell) || validateBishop(firstCell, secondCell);
+}
+
+function validateBishop(firstCell, secondCell) {
+    // A move from (C1, R1) to (C2, R2) is valid iff |C1-C2| == |R1-R2|
+    return Math.abs(firstCell.col - secondCell.col) == Math.abs(firstCell.row - secondCell.row);
+}
+
+function validateHorse(firstCell, secondCell) {
+    // A move from (C1, R1) to (C2, R2) is valid iff
+    // |C1-C2| == 1 and |R1-R2| == 2  OR |C1-C2| == 2 and |R1-R2| == 1
+    return (Math.abs(firstCell.col - secondCell.col) == 1 && Math.abs(firstCell.row - secondCell.row) == 2) ||
+    (Math.abs(firstCell.col - secondCell.col) == 2 && Math.abs(firstCell.row - secondCell.row) == 1);
+}
+
+function validateRoot(firstCell, secondCell) {
+    // A move from (C1, R1) to (C2, R2) is valid iff C1 == C2 or R1 == R2
+    return firstCell.col == secondCell.col || firstCell.row == secondCell.row;
+}
+
+function validatePawn(firstCell, secondCell) {
+    // TODO: Change logic so pawn can only move forward
+    return (firstCell.col == secondCell.col) && Math.abs(firstCell.row -  secondCell.row) == 1;
+}
+
+/*
+
+
+
+
+if (firstCell.piece !== null) {
+    let validMove = false;
+    // Initialize validity as false. If the condition is met, change it to true.
+    let fRow = firstCell.row;
+    let fCol = firstCell.col;
+    let sRow = secondCell.row;
+    let sCol = secondCell.col;
+    let curRow = fRow;
+    let curCol = fCol;
+    switch (firstCell.piece.type) {
+        case "K":
+            if (fRow - sRow === 1 || sRow - fRow === 1) {
+                if (fCol - sCol === 1 || sCol - fCol === 1) {
+                    validMove = true;
+                }
+            }
+            validMove = true;
+            break;
+        // case "P": //Pawn.
+        //   if(firstCell.piece.color === "white"){
+        //     if (secondCell.piece === null) {
+        //       if (fCol === sCol && fRow + 1 === sRow) {
+        //         validMove = true;
+        //     } else if (secondCell.piece.color === "black") {
+        //         if ((sCol === fCol + 1 || sCol === fCol - 1) && fRow + 1 === sRow) {
+        //           validMove = true;
+        //         }
+        //       }
+        //     }
+        //   } else if (firstCell.piece.color === "black") {
+        //     if (secondCell.piece === null) {
+        //       if (fCol === sCol && fRow === sRow + 1) {
+        //         validMove = true;
+        //       }
+        //     } else if (secondCell.piece.color === "white") {
+        //       if ((fCol === sCol - 1 || fCol === sCol + 1) && fRow === sRow + 1) {
+        //         validMove = true;
+        //       }
+        //     }
+        //   }
+        //   break;
+        case "H": //Horse.
+            if (fRow - sRow === 2 || sRow - fRow === 2) {
+                if (fCol - sCol === 1 || sCol - fCol === 1) {
+                    validMove = true;
+                }
+            } else if (fRow - sRow === 1 || sRow - fRow === 1) {
+                if (fCol - sCol === 2 || sCol - fCol === 2) {
+                    validMove = true
+                }
+            }
+            break;
+        case "B": //Bishop.
+            while (curRow <= 7 && curCol <= 7) {
+                if (curRow === sRow && curCol === sCol) {
+                    validMove = true;
+                }
+                curRow += 1;
+                curCol += 1;
+            }
+            curRow = fRow;
+            curCol = fCol;
+            while (curRow >= 0 && curCol >= 0) {
+                if (curRow === sRow && curCol === sCol) {
+                    validMove = true;
+                }
+                curRow -= 1;
+                curCol -= 1;
+            }
+            curRow = fRow;
+            curCol = fCol;
+            while (curRow <= 7 && curCol >= 0) {
+                if (curRow === sRow && curCol === sCol) {
+                    validMove = true;
+                }
+                curRow += 1;
+                curCol -= 1;
+            }
+            curRow = fRow;
+            curCol = fCol;
+            while (curRow >= 0 && curCol <= 7) {
+                if (curRow === sRow && curCol === sCol) {
+                    validMove = true;
+                }
+                curRow -= 1;
+                curCol += 1;
+            }
+            break;
+        case "R": //Rook.
+            while (curRow <= 7) {
+                if (curRow === sRow && curCol === sCol) {
+                    validMove = true;
+                }
+                curRow += 1;
+            }
+            curRow = fRow;
+            curCol = fCol;
+            while (curRow >= 0) {
+                if (curRow === sRow && curCol === sCol) {
+                    validMove = true;
+                }
+                curRow -= 1;
+            }
+            curRow = fRow;
+            curCol = fCol;
+            while (curCol >= 0) {
+                if (curRow === sRow && curCol === sCol) {
+                    validMove = true;
+                }
+                curCol -= 1;
+            }
+            curRow = fRow;
+            curCol = fCol;
+            while (curCol <= 7) {
+                if (curRow === sRow && curCol === sCol) {
+                    validMove = true;
+                }
+                curCol += 1;
+            }
+            break;
+        default:
+            console.log('Error Piece Detected');
+    }
+
+    else if (validMove && (secondCell.piece !== null)) {
+        if (firstCell.piece.color !== secondCell.piece.color) {
+            redisClient.lset('gameState', req.body.startCell, JSON.stringify({...firstCell, piece: null}));
+            redisClient.lset('gameState', req.body.endCell, JSON.stringify({...secondCell,piece: firstCell.piece}));
+            }
+        }
+    }
+*/
