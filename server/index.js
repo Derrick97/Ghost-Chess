@@ -181,8 +181,26 @@ function validateRoot(firstCell, secondCell) {
 }
 
 function validatePawn(firstCell, secondCell) {
-    // TODO: Change logic so pawn can only move forward
-    return (firstCell.col === secondCell.col) && Math.abs(firstCell.row -  secondCell.row) === 1;
+    //The pawn stay on the same col
+    let sameCol = (firstCell.col === secondCell.col);
+    //The pawn move 1 step
+    let moveOne = Math.abs(firstCell.row -  secondCell.row) === 1;
+    //The pawn move 2 step
+    let moveTwo = Math.abs(firstCell.row -  secondCell.row) === 2;
+    //The piece is white
+    if(firstCell.piece.color === 'white'){
+        //On the starting row
+        if(firstCell.row === 1){
+            return sameCol && (firstCell.row < secondCell.row) && (moveOne || moveTwo);
+        }
+        return sameCol && (firstCell.row < secondCell.row) && moveOne;
+    } else {
+        //The piece is black, on starting row
+        if(firstCell.row === 6){
+            return sameCol && (firstCell.row > secondCell.row) && (moveOne || moveTwo);
+        }
+        return sameCol && (secondCell.row > firstCell.row) && moveOne;
+    }
 }
 
 /*
