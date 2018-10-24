@@ -101,6 +101,7 @@ app.post('/makeMove', (req, res) => {
 
         // Get current gameState
         let gameState = reply.map(obj => JSON.parse(obj));
+        console.log(gameState);
 
         // Check if move is valid with the current gameState
         let validMove = validateMove(firstCell, secondCell, gameState);
@@ -169,17 +170,20 @@ function getCell(col, row, gameState) {
 }
 
 function validateKing(firstCell, secondCell) {
+  console.log('Validating King Move');
   // A move from (C1, R1) to (C2, R2) is valid iff |C1-C2| <= 1 and |R1-R2| <= 1
   return Math.abs(firstCell.col - secondCell.col) <= 1 &&
     Math.abs(firstCell.row - secondCell.row) <= 1
 }
 
 function validateQueen(firstCell, secondCell, gameState) {
+  console.log('Validating Queen Move');
   // A move is valid if it is a valid move for root or valid move for bishop
   return validateRook(firstCell, secondCell, gameState) || validateBishop(firstCell, secondCell, gameState);
 }
 
 function validateBishop(firstCell, secondCell, gameState) {
+  console.log('Validating Bishop Move');
   // A move from (C1, R1) to (C2, R2) is valid iff |C1-C2| == |R1-R2|
   if (Math.abs(firstCell.col - secondCell.col) !== Math.abs(firstCell.row - secondCell.row)) return false;
 
@@ -197,6 +201,7 @@ function validateBishop(firstCell, secondCell, gameState) {
     // excluding start and end cell ...
     for (let col = minCol + 1, row = minRow + 1; col < maxCol; col++, row++) {
       let cell = getCell(col, row, gameState);
+      console.log('Bishop: checking cell ' + cell);
       // ... To make sure there are no other pieces on the path
       if (cell.piece) return false;
     }
@@ -209,6 +214,7 @@ function validateBishop(firstCell, secondCell, gameState) {
     // excluding start and end cell ...
     for (let col = minCol + 1, row = maxRow - 1; col < maxCol; col++ , row--) {
       let cell = getCell(col, row, gameState);
+      console.log('Bishop: checking cell ' + cell);
       // ... To make sure there are no other pieces on the path
       if (cell.piece) return false;
     }
@@ -219,6 +225,7 @@ function validateBishop(firstCell, secondCell, gameState) {
 }
 
 function validateHorse(firstCell, secondCell) {
+  console.log('Validating Horse Move');
   // A move from (C1, R1) to (C2, R2) is valid iff
   // |C1-C2| == 1 and |R1-R2| == 2  OR |C1-C2| == 2 and |R1-R2| == 1
   return (Math.abs(firstCell.col - secondCell.col) === 1 && Math.abs(firstCell.row - secondCell.row) === 2) ||
@@ -226,6 +233,7 @@ function validateHorse(firstCell, secondCell) {
 }
 
 function validateRook(firstCell, secondCell, gameState) {
+  console.log('Validating Rook Move');
   // A move from (C1, R1) to (C2, R2) is valid iff C1 == C2 or R1 == R2
   if (!(firstCell.col === secondCell.col || firstCell.row === secondCell.row)) return false;
 
@@ -238,6 +246,7 @@ function validateRook(firstCell, secondCell, gameState) {
     // ... Excluding start and end cell ...
     for (let row = minRow + 1; row < maxRow; row++) {
       let cell = getCell(col, row, gameState);
+      console.log('Rook: checking cell ' + cell);
       // ... To make sure there are no other pieces on the path ...
       if (cell.peice) return false;
     }
@@ -250,6 +259,7 @@ function validateRook(firstCell, secondCell, gameState) {
     // ... Excluding start and end cell ...
     for (let col = minCol + 1; col < maxCol; col++) {
       let cell = getCell(col, row, gameState);
+      console.log('Rook: checking cell ' + cell);
       // ... To make sure there are no other pieces on the path ...
       if (cell.piece) return false;
     }
@@ -259,6 +269,7 @@ function validateRook(firstCell, secondCell, gameState) {
 }
 
 function validatePawn(firstCell, secondCell) {
+  console.log('Validating Pawn Move');
   //The pawn stay on the same col
   let sameCol = (firstCell.col === secondCell.col);
   //The pawn move 1 step
