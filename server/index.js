@@ -92,6 +92,7 @@ app.get('/getGameState', (req, res) => {
 
 // Make a move and update chessboard
 app.post('/makeMove', (req, res) => {
+  console.log('Moving from cell ' + req.body.startCell + ' to ' + req.body.endCell);
   redisClient.lindex('gameState', req.body.startCell, function (err, reply) {
     let firstCell = JSON.parse(reply);
     redisClient.lindex('gameState', req.body.endCell, function (err, reply) {
@@ -101,7 +102,7 @@ app.post('/makeMove', (req, res) => {
 
         // Get current gameState
         let gameState = reply.map(obj => JSON.parse(obj));
-        console.log(gameState);
+        console.log('GameState: ' + gameState);
 
         // Check if move is valid with the current gameState
         let validMove = validateMove(firstCell, secondCell, gameState);
