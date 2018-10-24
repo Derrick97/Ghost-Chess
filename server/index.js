@@ -95,8 +95,10 @@ app.post('/makeMove', (req, res) => {
   console.log('Moving from cell ' + req.body.startCell + ' to ' + req.body.endCell);
   redisClient.lindex('gameState', req.body.startCell, function (err, reply) {
     let firstCell = JSON.parse(reply);
+    console.log('First cell: ' + firstCell);
     redisClient.lindex('gameState', req.body.endCell, function (err, reply) {
       let secondCell = JSON.parse(reply);
+      console.log('Second cell: ' + secondCell);
 
       redisClient.lrange('gameState', 0, -1), function (err, reply) {
         console.log("Reply: " + reply);
@@ -120,7 +122,7 @@ app.post('/makeMove', (req, res) => {
 
         res.json(gameState);
         */
-      }
+      });
     });
   });
 });
