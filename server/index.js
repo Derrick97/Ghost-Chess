@@ -122,7 +122,7 @@ app.post('/makeMove', (req, res) => {
 
         res.json(gameState);
         */
-      });
+      }
     });
   });
 });
