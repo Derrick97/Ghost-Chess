@@ -99,7 +99,11 @@ app.post('/makeMove', (req, res) => {
       let secondCell = JSON.parse(reply);
 
       redisClient.lrange('gameState', 0, -1), function (err, reply) {
-
+        console.log("Reply: " + reply);
+        console.log(JSON.parse(reply));
+        console.log(JSON.parse(reply.map(obj => JSON.parse(obj))));
+        res.json([]);
+        /*
         // Get current gameState
         console.log('Getting current gamestate ...');
         let gameState = reply.map(obj => JSON.parse(obj));
@@ -115,6 +119,7 @@ app.post('/makeMove', (req, res) => {
         }
 
         res.json(gameState);
+        */
       }
     });
   });
