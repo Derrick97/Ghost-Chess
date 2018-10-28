@@ -147,6 +147,7 @@ app.listen(PORT, function () {
 });
 
 function updateGameState(firstCell, secondCell, req) {
+  // Move or capture piece and update gameState
   redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
   redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
 }
