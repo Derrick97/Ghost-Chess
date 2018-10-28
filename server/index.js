@@ -306,5 +306,13 @@ function validatePawn(firstCell, secondCell) {
 }
 
 function validatePawnCapture(firstCell, secondCell) {
-  return true;
+  //The piece is white
+  if (firstCell.piece.color === 'white') {
+    // It moves forward diagonally by 1 in its perspective
+    return (secondCell.row - firstCell.row === 1) && (Math.abs(firstCell.col - secondCell.col) === 1);
+  } else {
+    //The piece is black
+    // It moves forward diagonally by 1 in its perspective
+    return (firstCell.row - secondCell.row === 1) && (Math.abs(firstCell.col - secondCell.col) === 1);
+  }
 }
