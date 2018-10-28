@@ -111,13 +111,24 @@ app.post('/makeMove', (req, res) => {
         if (validMove) {
           if (secondCell.piece === null) {
             // Move if there is no piece in the second cell
-            // Or capture if piece in the second cell is an opponent color
-            // Pawn capture will be handled as a special case
             redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
             redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
           } else if (secondCell.piece.color !== firstCell.piece.color && firstCell.piece.type !== 'P') {
+            // Capture if piece in the second cell is an opponent color
+            // Pawn capture is not handled here
             redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
             redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+          }
+        }
+
+        // Special Case: handle Pawn Capture
+        if (firstCell.piece !== null && secondCell.piece !== null) {
+          if (firstCell.piece.type === 'P' && secondCell.piece.color !== firstCell.piece.color) {
+            let validPawnCapture = validatePawnCapture(firstCell, secondCell);
+            if (validPawnCapture) {
+              redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
+              redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+            }
           }
         }
 
@@ -292,4 +303,8 @@ function validatePawn(firstCell, secondCell) {
     }
     return sameCol && (secondCell.row < firstCell.row) && moveOne;
   }
+}
+
+function validatePawnCapture(firstCell, secondCell) {
+  return true;
 }
