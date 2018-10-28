@@ -113,13 +113,13 @@ app.post('/makeMove', (req, res) => {
             // Move if there is no piece in the second cell
             // redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
             // redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
-            updateGameState();
+            updateGameState(firstCell, secondCell, req);
           } else if (secondCell.piece.color !== firstCell.piece.color && firstCell.piece.type !== 'P') {
             // Capture if piece in the second cell is an opponent color
             // Pawn capture is not handled here
             // redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
             // redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
-            updateGameState();
+            updateGameState(firstCell, secondCell, req);
           }
         }
 
@@ -133,7 +133,7 @@ app.post('/makeMove', (req, res) => {
             if (validPawnCapture) {
               // redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
               // redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
-              updateGameState();
+              updateGameState(firstCell, secondCell, req);
             }
           }
         }
@@ -152,7 +152,7 @@ app.listen(PORT, function () {
   console.log(`App listening on port ${PORT}`);
 });
 
-function updateGameState() {
+function updateGameState(firstCell, secondCell, req) {
   redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
   redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
 }
