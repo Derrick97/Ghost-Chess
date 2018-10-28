@@ -122,9 +122,12 @@ app.post('/makeMove', (req, res) => {
         }
 
         // Special Case: handle Pawn Capture
+        // Check that there are pieces in both cells
         if (firstCell.piece !== null && secondCell.piece !== null) {
+          // Check if first piece is a pawn and second piece is an opponent
           if (firstCell.piece.type === 'P' && secondCell.piece.color !== firstCell.piece.color) {
             let validPawnCapture = validatePawnCapture(firstCell, secondCell);
+            // Check if the pawn capture is valid
             if (validPawnCapture) {
               redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
               redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
