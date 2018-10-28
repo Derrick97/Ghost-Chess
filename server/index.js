@@ -103,13 +103,22 @@ app.post('/makeMove', (req, res) => {
         // Get current gameState
         let gameState = reply.map(obj => JSON.parse(obj));
 
+
         // Check if move is valid with the current gameState
         let validMove = validateMove(firstCell, secondCell, gameState);
 
         // Update move if move is valid
         if (validMove) {
-          redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
-          redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+          if (secondCell.piece === null) {
+            // Move if there is no piece in the second cell
+            // Or capture if piece in the second cell is an opponent color
+            // Pawn capture will be handled as a special case
+            redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
+            redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+          } else if (secondCell.piece.color !== firstCell.piece.color && firstCell.piece.type !== 'P') {
+            redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
+            redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+          }
         }
 
         // Return updated gameState
@@ -129,9 +138,6 @@ app.listen(PORT, function () {
 function validateMove(firstCell, secondCell, gameState) {
   // Check first cell contains piece
   if (firstCell.piece == null) return false;
-  // Check second cell does not contain piece.
-  // TODO: modify logic for piece capture
-  if (secondCell.piece !== null) return false;
   // Check the two cells are different
   if (firstCell.col === secondCell.col && firstCell.row === secondCell.row) return false;
 

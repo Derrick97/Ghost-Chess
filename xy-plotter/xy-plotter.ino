@@ -21,17 +21,37 @@ void setup(){
 void loop(){
     
     while(Serial.available()){
+        /*
+        char buffer_[20];
+        Serial.readBytes(buffer_, 20);
+        Serial.println(buffer_);
+        */
+        
         char command = (char)Serial.read();
+        
         if(command == 'x'){
-            stepper_1.move(30);
+            stepper_1.move(60);
             stepper_1.setMaxSpeed(100);
             stepper_1.setSpeed(100);
         }
         if(command == 'y'){
-            stepper_2.move(30);
+            stepper_2.move(60);
             stepper_2.setMaxSpeed(100);
             stepper_2.setSpeed(100);
         }
+        if(command == 'w'){
+            stepper_1.move(60);
+            stepper_2.move(60);
+            stepper_2.setMaxSpeed(100);
+            stepper_2.setSpeed(100);
+        }
+        if(command == 'z'){
+            stepper_1.move(-60);
+            stepper_2.move(-60);
+            stepper_2.setMaxSpeed(100);
+            stepper_2.setSpeed(100);
+        }
+        
     }
     
     _loop();
@@ -49,4 +69,3 @@ void _loop(){
     
     
 }
-
