@@ -111,13 +111,15 @@ app.post('/makeMove', (req, res) => {
         if (validMove) {
           if (secondCell.piece === null) {
             // Move if there is no piece in the second cell
-            redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
-            redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+            // redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
+            // redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+            updateGameState();
           } else if (secondCell.piece.color !== firstCell.piece.color && firstCell.piece.type !== 'P') {
             // Capture if piece in the second cell is an opponent color
             // Pawn capture is not handled here
-            redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
-            redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+            // redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
+            // redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+            updateGameState();
           }
         }
 
@@ -129,8 +131,9 @@ app.post('/makeMove', (req, res) => {
             let validPawnCapture = validatePawnCapture(firstCell, secondCell);
             // Check if the pawn capture is valid
             if (validPawnCapture) {
-              redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
-              redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+              // redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
+              // redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+              updateGameState();
             }
           }
         }
@@ -148,6 +151,11 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, function () {
   console.log(`App listening on port ${PORT}`);
 });
+
+function updateGameState() {
+  redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
+  redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+}
 
 function validateMove(firstCell, secondCell, gameState) {
   // Check first cell contains piece
