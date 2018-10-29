@@ -1,5 +1,7 @@
 const express = require("express");
 const BodyParser = require("body-parser");
+import fetch from 'node-fetch';
+
 const app = express();
 app.use(BodyParser.urlencoded({ extended: false }));
 app.use(BodyParser.json());
@@ -111,6 +113,15 @@ app.post('/makeMove', (req, res) => {
           // Update gameState
           redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
           redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+
+          // Send instruction to plotter
+          let instruction = generateInstruction();
+          // This address changes everytime when ngrok restarts
+          fetch('https://04652c46.ngrok.io/movePlotter', {
+            method: 'POST',
+            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ instruction: instruction })
+          });
         }
 
         // Return updated gameState
@@ -126,6 +137,10 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, function () {
   console.log(`App listening on port ${PORT}`);
 });
+
+/************************************************************************************************************
+ * Functions for Validating Move
+ ************************************************************************************************************/
 
 function validateMove(firstCell, secondCell, gameState) {
   // Check first cell contains piece
@@ -298,4 +313,13 @@ function validatePawn(firstCell, secondCell) {
       return moveForward && (moveOne || capture);
     }
   }
+}
+
+/************************************************************************************************************
+ * Functions for Generating Instruction to Plotter
+ ************************************************************************************************************/
+
+// TODO: Return instruction code to plotter
+function generateInstruction() {
+  return 123456;
 }
