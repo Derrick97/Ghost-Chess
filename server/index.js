@@ -120,7 +120,7 @@ app.post('/makeMove', (req, res) => {
           fetch('https://04652c46.ngrok.io/movePlotter', {
             method: 'POST',
             headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-            body: JSON.stringify({ instruction: instruction })
+            body: JSON.stringify({ instructions: instruction })
           });
         }
 
