@@ -115,7 +115,7 @@ app.post('/makeMove', (req, res) => {
           redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
 
           // Send instruction to plotter
-          let instruction = generateInstruction();
+          let instruction = generateInstruction(req.body.startCell, req.body.endCell);
           // This address changes everytime when ngrok restarts
           fetch('https://04652c46.ngrok.io/movePlotter', {
             method: 'POST',
