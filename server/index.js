@@ -360,6 +360,6 @@ function generateInstruction(startCell, endCell) {
   // 5. Go back to original point.
   let resetToOriginal = '000#';
 
-  instructionSet = gotoStartRow + gotoStartCol + startToEndRow + startToEndCol + resetToOriginal;
+  instructionSet = gotoStartRow + gotoStartCol + startToEndRow + startToEndCol;
   return instructionSet;
 }
