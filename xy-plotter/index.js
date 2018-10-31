@@ -15,6 +15,7 @@ app.get('/', (req, res) => {
 
 app.post('/movePlotter', (req, res) => {
   // Sends instruction to plotter serial port
+  console.log(req.body.instructions);
   port.write(req.body.instructions);
   res.send("Done!");
 });
