@@ -1,5 +1,7 @@
 const express = require("express");
 const BodyParser = require("body-parser");
+const fetch = require('node-fetch');
+
 const app = express();
 app.use(BodyParser.urlencoded({ extended: false }));
 app.use(BodyParser.json());
@@ -103,33 +105,23 @@ app.post('/makeMove', (req, res) => {
         // Get current gameState
         let gameState = reply.map(obj => JSON.parse(obj));
 
-
         // Check if move is valid with the current gameState
         let validMove = validateMove(firstCell, secondCell, gameState);
 
         // Update move if move is valid
         if (validMove) {
-          if (secondCell.piece === null) {
-            // Move if there is no piece in the second cell
-            updateGameState(firstCell, secondCell, req);
-          } else if (secondCell.piece.color !== firstCell.piece.color && firstCell.piece.type !== 'P') {
-            // Capture if piece in the second cell is an opponent color
-            // Pawn capture is not handled here
-            updateGameState(firstCell, secondCell, req);
-          }
-        }
+          // Update gameState
+          redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
+          redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
 
-        // Special Case: handle Pawn Capture
-        // Check that there are pieces in both cells
-        if (firstCell.piece !== null && secondCell.piece !== null) {
-          // Check if first piece is a pawn and second piece is an opponent
-          if (firstCell.piece.type === 'P' && secondCell.piece.color !== firstCell.piece.color) {
-            let validPawnCapture = validatePawnCapture(firstCell, secondCell);
-            // Check if the pawn capture is valid
-            if (validPawnCapture) {
-              updateGameState(firstCell, secondCell, req);
-            }
-          }
+          // Send instruction to plotter
+          let instruction = generateInstruction(req.body.startCell, req.body.endCell);
+          // This address changes everytime when ngrok restarts
+          fetch('https://04652c46.ngrok.io/movePlotter', {
+            method: 'POST',
+            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ instructions: instruction })
+          });
         }
 
         // Return updated gameState
@@ -146,17 +138,17 @@ app.listen(PORT, function () {
   console.log(`App listening on port ${PORT}`);
 });
 
-function updateGameState(firstCell, secondCell, req) {
-  // Move or capture piece and update gameState
-  redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
-  redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
-}
+/************************************************************************************************************
+ * Functions for Validating Move
+ ************************************************************************************************************/
 
 function validateMove(firstCell, secondCell, gameState) {
   // Check first cell contains piece
   if (firstCell.piece == null) return false;
   // Check the two cells are different
   if (firstCell.col === secondCell.col && firstCell.row === secondCell.row) return false;
+  // Check second cell does not contain piece of same color
+  if (secondCell.piece && firstCell.piece.color === secondCell.piece.color) return false;
 
   // Initailize isValidMove to false
   let isValidMove = false;
@@ -289,36 +281,85 @@ function validateRook(firstCell, secondCell, gameState) {
 
 function validatePawn(firstCell, secondCell) {
   console.log('Validating Pawn Move ...');
-  //The pawn stay on the same col
-  let sameCol = (firstCell.col === secondCell.col);
-  //The pawn move 1 step
-  let moveOne = Math.abs(firstCell.row - secondCell.row) === 1;
-  //The pawn move 2 step
-  let moveTwo = Math.abs(firstCell.row - secondCell.row) === 2;
-  //The piece is white
+
+  let rowDifference = Math.abs(firstCell.row - secondCell.row);
+  let colDifference = Math.abs(firstCell.col - secondCell.col);
+
+  // Pawn can have three valid moves:
+  // 1. One step forward
+  let moveOne = colDifference === 0 && rowDifference === 1;
+  // 2. Two steps forward (When in starting position)
+  let moveTwo = colDifference === 0 && rowDifference === 2;
+  // 3. Capture enemy piece
+  let capture = secondCell.piece && (firstCell.piece.color !== secondCell.piece.color)
+    && (rowDifference === 1) && (colDifference === 1)
+
+  //If the piece is white ...
   if (firstCell.piece.color === 'white') {
-    //On the starting row
-    if (firstCell.row === 1) {
-      return sameCol && (firstCell.row < secondCell.row) && (moveOne || moveTwo);
+    let moveForward = firstCell.row < secondCell.row;
+    // ... and it is in starting position ...
+    if (firstCell.row == 1) {
+      return moveForward && (moveOne || moveTwo || capture);
+    } else {
+      return moveForward && (moveOne || capture);
     }
-    return sameCol && (firstCell.row < secondCell.row) && moveOne;
   } else {
-    //The piece is black, on starting row
+    //Otherwise. the piece is black
+    let moveForward = secondCell.row < firstCell.row;
+    // ... and it is in starting position ...
     if (firstCell.row === 6) {
-      return sameCol && (secondCell.row < firstCell.row) && (moveOne || moveTwo);
+      return moveForward && (moveOne || moveTwo || capture);
+    } else {
+      return moveForward && (moveOne || capture);
     }
-    return sameCol && (secondCell.row < firstCell.row) && moveOne;
   }
 }
 
-function validatePawnCapture(firstCell, secondCell) {
-  //The piece is white
-  if (firstCell.piece.color === 'white') {
-    // It moves forward diagonally by 1 in its perspective
-    return (secondCell.row - firstCell.row === 1) && (Math.abs(firstCell.col - secondCell.col) === 1);
+/************************************************************************************************************
+ * Functions for Generating Instruction to Plotter
+ ************************************************************************************************************/
+// TODO: Refractor function, make direction an enum.
+// function generateMoveInstruction(direction, distance, magnetStatus){
+//   switch (direction){
+//      case 'north':
+//      return 0;
+//      case 
+//   }
+// }
+
+
+// TODO: Return instruction code to plotter
+function generateInstruction(startCell, endCell) {
+  let instructionSet = ''
+  let startRow = startCell.row
+  let startCol = startCell.col
+  let endRow = endCell.row
+  let endCol = endCell.col
+  // 1. Start from (0.0), go to (startRow, 0): Goes East, move "startRow" units, turn off the magnets.
+  let gotoStartRow = '2' + startRow + '0#'
+  // 2. From (startRow, 0) go to (startRow, startCol): Goes South, move "startCol" units, turn off the magnets.
+  let gotoStartCol = '4' + startCol + '0#'
+  // 3. Then from (startRow, startCol) to (endRow, startCol)
+  let startToEndRow = ''
+  if (rowDistance = endRow - startRow <=0){
+    // rowDistance <=0: North, move "rowDistance" units, turn on magnets.
+      startToEndRow = '0' + rowDistance + '1#'
   } else {
-    //The piece is black
-    // It moves forward diagonally by 1 in its perspective
-    return (firstCell.row - secondCell.row === 1) && (Math.abs(firstCell.col - secondCell.col) === 1);
+    // Else go south, others remain the same.
+      startToEndRow = '4' + rowDistance + '1#'
   }
+  // 4. Then from (endRow, startCol) to (endRow, endCol)
+  let startToEndCol = ''
+  if (colDistance = endCol - startCol <=0){
+    // colDistance <=0: West, move "colDistance" units, turn on magnets.
+      startToEndCol = '6' + colDistance + '1#'
+  } else {
+    // Else go East, others remain the same.
+      startToEndCol = '2' + colDistance + '1#'
+  }
+  // 5. Go back to original point.
+  let resetToOriginal = '000#';
+
+  instructionSet = gotoStartRow + gotoStartCol + startToEndRow + startToEndCol + resetToOriginal;
+  return instructionSet;
 }
