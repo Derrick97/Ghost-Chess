@@ -343,6 +343,7 @@ function generateInstruction(startCell, endCell) {
   let startToEndRow = ''
   let rowDistance = endRow - startRow;
   if (rowDistance <= 0) {
+    rowDistance = rowDistance * -1;
     // rowDistance <=0: North, move "rowDistance" units, turn on magnets.
       startToEndRow = '0' + rowDistance + '1#'
   } else {
@@ -352,9 +353,10 @@ function generateInstruction(startCell, endCell) {
   // 4. Then from (endRow, startCol) to (endRow, endCol)
   let startToEndCol = ''
   let colDistance = endCol - startCol;
-  if (colDistance <=0){
+  if (colDistance <= 0) {
+    colDistance = colDistance * -1;
     // colDistance <=0: West, move "colDistance" units, turn on magnets.
-      startToEndCol = '6' + colDistance + '1#'
+    startToEndCol = '6' + colDistance + '1#'
   } else {
     // Else go East, others remain the same.
       startToEndCol = '2' + colDistance + '1#'
