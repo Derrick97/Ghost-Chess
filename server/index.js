@@ -117,7 +117,7 @@ app.post('/makeMove', (req, res) => {
           // Send instruction to plotter
           let instruction = generateInstruction(req.body.startCell, req.body.endCell);
           // This address changes everytime when ngrok restarts
-          fetch('https://2e342a5b.ngrok.io/movePlotter', {
+          fetch('https://cc8f4ab9.ngrok.io/movePlotter', {
             method: 'POST',
             headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify({ instructions: instruction })
