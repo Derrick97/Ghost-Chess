@@ -19,7 +19,7 @@ MeStepper stepper_1(1);
 MeStepper stepper_2(2);
 double MaxSpeed = 100.0;
 double Speed = 100.0;
-double CellSize = 30.0;
+double CellSize = 100.0;
 MeLimitSwitch sw_3_1(3,1);
 MeLimitSwitch sw_3_2(3,2);
 MeLimitSwitch sw_6_1(6,1);
@@ -28,6 +28,7 @@ char buffer[4];
 // index: how many command in commands
 int WriteIndex=0;
 int ReadIndex=0;
+bool available= true;
 
 
 
@@ -72,8 +73,9 @@ void loop(){
           
 //        }
   }
-        
-      if(commands[ReadIndex].distance!=0){
+       Serial.println(available);
+      if(commands[ReadIndex].distance!=0 && available){
+        available = false;
        Serial.println("wp2");
        Serial.println(commands[ReadIndex].direction);
        Serial.println(commands[ReadIndex].distance);
@@ -113,8 +115,10 @@ void loop(){
       stepper_2.move(CellSize*y);
       stepper_2.setMaxSpeed(MaxSpeed);
       stepper_2.setSpeed(Speed);
+      
       ReadIndex++;
       }  
+      delay(10);
      _loop();
 //}
 }
@@ -128,6 +132,14 @@ void _loop(){
 //  if(!stepper_1.runSpeedToPosition() && !stepper_2.runSpeedToPosition() && magnet == true){
 //    digitalWrite(6,LOW);
 //    }
-stepper_1.runSpeedToPosition();
-stepper_2.runSpeedToPosition();
+bool steppe1 = stepper_1.runSpeedToPosition();
+bool steppe2 = stepper_2.runSpeedToPosition();
+  if (!steppe2 && !steppe1){
+  available = true;
+//  Serial.println("available");
+  }
+//  else{
+//    Serial.println("moving");
+//    }
+
 }
