@@ -335,10 +335,10 @@ function generateInstruction(startCell, endCell) {
   let startCol = startCell.col
   let endRow = endCell.row
   let endCol = endCell.col
-  // 1. Start from (0.0), go to (startRow, 0): Goes East, move "startRow" units, turn off the magnets.
-  let gotoStartRow = '2' + startRow + '0#'
-  // 2. From (startRow, 0) go to (startRow, startCol): Goes South, move "startCol" units, turn off the magnets.
-  let gotoStartCol = '4' + startCol + '0#'
+  // 1. Start from (0.0), go to (startRow, 0): Goes South, move "startRow" units, turn off the magnets.
+  let gotoStartRow = '4' + startRow + '0#'
+  // 2. From (startRow, 0) go to (startRow, startCol): Goes East, move "startCol" units, turn off the magnets.
+  let gotoStartCol = '2' + startCol + '0#'
   // 3. Then from (startRow, startCol) to (endRow, startCol)
   let startToEndRow = ''
   let rowDistance = endRow - startRow;
