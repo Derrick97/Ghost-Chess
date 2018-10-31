@@ -2,8 +2,11 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import styled from 'styled-components';
 
-const backgroundColor = ({ col, row }) => {
-  return (col + row) % 2 === 1 ? '#0F984A' : '#5AF29B';
+const backgroundColor = ({ col, row, isHighlighted }) => {
+    if (isHighlighted) {
+        return '#1E90FF';
+    }
+  return (col + row) % 2 === 1 ? '#7D473B' : '#FDF2DC';
 };
 
 const StyledCell = styled.TouchableHighlight`
@@ -59,7 +62,7 @@ export default class Cell extends React.Component {
 
   render() {
     return (
-      <StyledCell underlayColor='grey' col={this.props.col} row={this.props.row} onPress={this.handlePress}>
+      <StyledCell underlayColor='grey' col={this.props.col} row={this.props.row} isHighlighted={this.props.isHighlighted} onPress={this.handlePress}>
         {
           this.props.piece ? <Piece color={this.props.piece.color} type={this.props.piece.type}/> : <Text/>
         }
