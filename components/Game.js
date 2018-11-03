@@ -3,12 +3,6 @@ import { Text, View } from 'react-native';
 import Board from './Board';
 import styled from 'styled-components';
 
-const StyledInvalidText = styled.Text`
-    font-size: 25;
-    margin-top: 15;
-    align-self: center;
-`;
-
 export default class Game extends React.Component {
 
   constructor() {
@@ -58,12 +52,13 @@ export default class Game extends React.Component {
   render() {
     return (
       <View >
-        <Board gameState={this.state.gameState}
-          updateGameState={this.updateGameState} />
+        <Text>Player: {this.state.player}</Text>
         {
           this.state.showInvalidText &&
-          <StyledInvalidText> Invalid Move! </StyledInvalidText>
+          <Text> Invalid Move! </Text>
         }
+        <Board gameState={this.state.gameState}
+          updateGameState={this.updateGameState} />
       </View>
     );
   }
