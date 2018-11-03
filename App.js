@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
-import Board from './components/Board';
+import Game from './components/Game';
 
 export default class App extends React.Component {
   constructor() {
@@ -9,7 +9,7 @@ export default class App extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Board/>
+        <Game/>
       </View>
     );
   }
@@ -23,10 +23,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-        // {/* Example of calling API using node fetch */}
-        // <Button title="Get GameState" onPress={() => {
-        //   fetch('https://ghost-chess.herokuapp.com/getGameState')
-        //     .then(res => res.text())
-        //     .then(text => this.setState({ text: text }));
-        // }} />

@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\server"
+    "\\server",
+    "\\xy-plotter"
   ],
-  "SelectedNode": "\\server\\index.js",
+  "SelectedNode": "\\xy-plotter\\xy-plotter.ino",
   "PreviewInSolutionExplorer": false
 }
