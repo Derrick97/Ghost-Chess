@@ -106,7 +106,8 @@ app.post('/makeMove', (req, res) => {
         let gameState = reply.map(obj => JSON.parse(obj));
 
         // Check if move is valid with the current gameState
-        let validMove = validateMove(firstCell, secondCell, gameState);
+        let player = req.body.player;
+        let validMove = validateMove(firstCell, secondCell, gameState, player);
 
         // Update move if move is valid
         if (validMove) {
@@ -122,12 +123,16 @@ app.post('/makeMove', (req, res) => {
             headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify({ instructions: instruction })
           });
-        }
 
-        // Return updated gameState
-        redisClient.lrange('gameState', 0, -1, function (err, reply) {
-          res.json(reply.map(obj => JSON.parse(obj)));
-        });
+          // Return updated gameState
+          redisClient.lrange('gameState', 0, -1, function (err, reply) {
+            res.json(reply.map(obj => JSON.parse(obj)));
+          });
+        } else {
+          // Otherwise, the move is invalid ...
+          // ... return empty list to indicate move failed
+          res.json([]);
+        }
       });
     });
   });
@@ -142,9 +147,11 @@ app.listen(PORT, function () {
  * Functions for Validating Move
  ************************************************************************************************************/
 
-function validateMove(firstCell, secondCell, gameState) {
+function validateMove(firstCell, secondCell, gameState, player) {
   // Check first cell contains piece
   if (firstCell.piece == null) return false;
+  // Check that player is moving their own chess
+  if (firstCell.piece.color !== player) return false;
   // Check the two cells are different
   if (firstCell.col === secondCell.col && firstCell.row === secondCell.row) return false;
   // Check second cell does not contain piece of same color

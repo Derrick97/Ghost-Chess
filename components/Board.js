@@ -12,7 +12,6 @@ const StyledBoard = styled.View`
 
 export default class Board extends React.Component {
 
-
   constructor() {
     super();
     this.state = {
@@ -24,49 +23,59 @@ export default class Board extends React.Component {
     this.handleCellPress = this.handleCellPress.bind(this)
   }
 
-  componentDidMount() {
-    fetch('https://ghost-chess.herokuapp.com/getGameState')
-      .then(res => res.json())
-      .then(json => this.setState({ gameState: json }));
-  }
-
-  // Returns the Cell object with the specified column and row from a given GameState
-  getCell(col, row) {
-    return this.state.gameState.find(function (cell) {
-      return cell.col === col && cell.row === row
-    });
-  }
-
-  // Returns true if two cells have pieces with the same color.
-  checkSamePieceColor(cell1, cell2) {
-    return cell1.piece !== null && cell2.piece !== null && cell1.piece.color === cell2.piece.color;
-  }
-
-  // Returns true if the col and row lies inside the board.
-  checkInsideBoard(col, row) {
-    return col >= 0 && row >= 0 && col <= 7 && row <= 7;
-  }
-
-  // Returns the valid cell if the possible move is a valid move.
-  checkValidMove(cell, col, row) {
-    if (this.checkInsideBoard(col, row)) {
-      let possibleCell = this.getCell(col, row);
-      if (!this.checkSamePieceColor(cell, possibleCell)) {
-        return possibleCell;
-      }
+  // Update state when props change
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.gameState !== this.props.gameState) {
+      this.setState({
+        gameState: nextProps.gameState,
+      });
     }
-    return null;
   }
 
-  checkValidMoveForPawn(cell, col, row) {
-    if (this.checkInsideBoard(col, row)) {
-      let possibleCell = this.getCell(col, row);
-      if (possibleCell.piece === null) {
-        return possibleCell;
+  handleCellPress(index) {
+    // If no chess piece is selected ...
+    if (this.startCell === null) {
+      if (this.state.gameState[index].piece !== null) {
+        // ... set start cell to cell index
+        this.startCell = index;
+        // TODO: possible moves
+        let cell = this.state.gameState[index];
+        let possibleMoves = this.findValidMove(cell);
+        this.setState({ highlightedCells: possibleMoves });
       }
+    } else {
+      // Otherwise, chess piece is already selected ...
+      this.endCell = index;
+      this.props.updateGameState(this.startCell, this.endCell);
+      this.startCell = null;
+      this.endCell = null;
     }
-    return null;
   }
+
+  render() {
+    return (
+      <StyledBoard>
+        {
+          this.state.gameState &&
+          this.state.gameState.map((cell, index) => {
+            return (<Cell
+              key={index}
+              id={index}
+              col={cell.col}
+              row={cell.row}
+              piece={cell.piece}
+              isHighlighted={this.state.highlightedCells.includes(this.getCell(cell.col, cell.row))}
+              handleCellPress={this.handleCellPress}
+            />);
+          })
+        }
+      </StyledBoard>
+    )
+  }
+
+  /****************************************************************************************************************
+   * Find Valid Moves
+   * **************************************************************************************************************/
 
   findValidMove(cell) {
     // Initailize ValidMove to an empty array
@@ -252,54 +261,49 @@ export default class Board extends React.Component {
     return validMoves;
   }
 
-  handleCellPress(index) {
-    // If no chess piece is selected ...
-    if (this.startCell === null) {
-      if (this.state.gameState[index].piece !== null) {
-        // ... set start cell to cell index
-        this.startCell = index;
-        // TODO: possible moves
-        let cell = this.state.gameState[index];
-        let possibleMoves = this.findValidMove(cell);
-        this.setState({ highlightedCells: possibleMoves });
-      }
-    } else {
-      // Otherwise, chess piece is already selected ...
-      this.endCell = index;
-      // ... Send start and end cell to server to make move
-      fetch('https://ghost-chess.herokuapp.com/makeMove', {
-        method: 'POST',
-        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ startCell: this.startCell, endCell: this.endCell })
-      })
-        .then(res => res.json())
-        .then(json => {
-          this.setState({ gameState: json });
-          this.startCell = null;
-          this.endCell = null;
-        });
-    }
+  /****************************************************************************************************************
+   * Find Valid Moves - Helper Functions
+   * **************************************************************************************************************/
+
+  // Returns the Cell object with the specified column and row from a given GameState
+  getCell(col, row) {
+    return this.state.gameState.find(function (cell) {
+      return cell.col === col && cell.row === row
+    });
   }
 
-  render() {
-    return (
-      <StyledBoard>
-        {
-          this.state.gameState &&
-          this.state.gameState.map((cell, index) => {
-            return (<Cell
-              key={index}
-              id={index}
-              col={cell.col}
-              row={cell.row}
-              piece={cell.piece}
-              isHighlighted={this.state.highlightedCells.includes(this.getCell(cell.col, cell.row))}
-              handleCellPress={this.handleCellPress}
-            />);
-          })
-        }
-      </StyledBoard>
-    )
+  // Returns true if two cells have pieces with the same color.
+  checkSamePieceColor(cell1, cell2) {
+    return cell1.piece && cell2.piece && cell1.piece.color === cell2.piece.color;
   }
+
+  // Returns true if the col and row lies inside the board.
+  checkInsideBoard(col, row) {
+    return col >= 0 && row >= 0 && col <= 7 && row <= 7;
+  }
+
+  // Returns the valid cell if the possible move is a valid move.
+  checkValidMove(cell, col, row) {
+    if (this.checkInsideBoard(col, row)) {
+      let possibleCell = this.getCell(col, row);
+      if (!this.checkSamePieceColor(cell, possibleCell)) {
+        return possibleCell;
+      }
+    }
+    return null;
+  }
+
+  checkValidMoveForPawn(cell, col, row) {
+    if (this.checkInsideBoard(col, row)) {
+      let possibleCell = this.getCell(col, row);
+      if (possibleCell.piece === null) {
+        return possibleCell;
+      }
+    }
+    return null;
+  }
+  
+
+  
 
 }
