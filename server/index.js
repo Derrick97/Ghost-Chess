@@ -129,7 +129,7 @@ websocket.on('connection', (socket) => {
 
             // Return updated gameState
             redisClient.lrange('gameState', 0, -1, function (err, reply) {
-              socket.broadcast.emit('gameState', reply.map(obj => JSON.parse(obj)));
+              socket.emit('broadcast', reply.map(obj => JSON.parse(obj)));
             });
           } else {
             // Otherwise, the move is invalid ...
