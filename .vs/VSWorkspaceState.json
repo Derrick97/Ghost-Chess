@@ -1,9 +1,10 @@
 {
   "ExpandedNodes": [
     "",
+    "\\components",
     "\\server",
     "\\xy-plotter"
   ],
-  "SelectedNode": "\\xy-plotter\\xy-plotter.ino",
+  "SelectedNode": "\\components\\Cell.js",
   "PreviewInSolutionExplorer": false
 }

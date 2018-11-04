@@ -1,10 +1,14 @@
 const express = require("express");
-const BodyParser = require("body-parser");
+const http = require('http')
+var socketio = require('socket.io');
 const fetch = require('node-fetch');
+const BodyParser = require("body-parser");
 
 const app = express();
 app.use(BodyParser.urlencoded({ extended: false }));
 app.use(BodyParser.json());
+const server = http.Server(app);
+const websocket = socketio(server);
 
 // Set up Redis Client
 const redisClient = require('redis').createClient(process.env.REDIS_URL);
@@ -80,10 +84,65 @@ redisClient.flushall(function (err, res) {
   redisClient.rpush("gameState", gameState.map(obj => JSON.stringify(obj)));
 });
 
-
 app.get('/', (req, res) => {
   res.send('API working');
 });
+
+// When a socket is connected ...
+websocket.on('connection', (socket) => {
+
+  // ... Get game state and send to client
+  redisClient.lrange('gameState', 0, -1, function (err, reply) {
+    socket.emit('gameState', reply.map(obj => JSON.parse(obj)));
+  });
+
+  socket.on('makeMove', (data) => {
+    console.log('Moving from cell ' + data.startCell + ' to ' + data.endCell);
+    redisClient.lindex('gameState', data.startCell, function (err, reply) {
+      let firstCell = JSON.parse(reply);
+      redisClient.lindex('gameState', data.endCell, function (err, reply) {
+        let secondCell = JSON.parse(reply);
+
+        redisClient.lrange('gameState', 0, -1, function (err, reply) {
+
+          // Get current gameState
+          let gameState = reply.map(obj => JSON.parse(obj));
+
+          // Check if move is valid with the current gameState
+          let player = data.player;
+          let validMove = validateMove(firstCell, secondCell, gameState, player);
+
+          // Update move if move is valid
+          if (validMove) {
+            // Update gameState
+            redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
+            redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+
+            // Send instruction to plotter
+            let instruction = generateInstruction(firstCell, secondCell);
+            // This address changes everytime when ngrok restarts
+            fetch('https://cc8f4ab9.ngrok.io/movePlotter', {
+              method: 'POST',
+              headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+              body: JSON.stringify({ instructions: instruction })
+            });
+
+            // Return updated gameState
+            redisClient.lrange('gameState', 0, -1, function (err, reply) {
+              socket.broadcast.emit('gameState', reply.map(obj => JSON.parse(obj)));
+            });
+          } else {
+            // Otherwise, the move is invalid ...
+            // ... return empty list to indicate move failed
+            socket.emit('gameState', []);
+          }
+        });
+      });
+    });
+  })
+});
+
+/*
 
 // Get game state of chessboard
 app.get('/getGameState', (req, res) => {
@@ -138,10 +197,10 @@ app.post('/makeMove', (req, res) => {
   });
 });
 
+*/
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, function () {
-  console.log(`App listening on port ${PORT}`);
-});
+server.listen(PORT, () => console.log(`listening on *:${PORT}`));
 
 /************************************************************************************************************
  * Functions for Validating Move

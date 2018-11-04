@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import Board from './Board';
 import styled from 'styled-components';
+const io = require('socket.io-client');
 
 export default class Game extends React.Component {
 
@@ -10,18 +11,48 @@ export default class Game extends React.Component {
     this.state = {
       gameState: null,
       player: 'white',
-      showInvalidText: false,
+      invalidMoveMessage: '',
     }
     this.updateGameState = this.updateGameState.bind(this);
+    this.socket = io('https://ghost-chess.herokuapp.com', {
+      transports: ['websocket'],
+    });
   }
 
   componentDidMount() {
+    this.socket.on('gameState', data => {
+      // Server returns list of GameState, indicating move is valid
+      if (data.length) {
+        // Update the gamestate and change player
+        this.setState({
+          gameState: data,
+          player: this.state.player === "white" ? "black" : "white",
+          invalidMoveMessage: ''
+        });
+      } else {
+        // Otherwise, the move is invalid
+        this.setState({ invalidMoveMessage: 'Invalid Move!' });
+      }     
+    });
+
+    /*
     fetch('https://ghost-chess.herokuapp.com/getGameState')
       .then(res => res.json())
       .then(json => this.setState({ gameState: json }));
+    */
   }
 
   updateGameState(startCell, endCell) {
+    this.socket.emit('makeMove',
+      {
+        startCell: startCell,
+        endCell: endCell,
+        player: this.state.player
+      }
+    );
+
+
+    /*
     // ... Send start and end cell to server to make move
     fetch('https://ghost-chess.herokuapp.com/makeMove', {
       method: 'POST',
@@ -40,23 +71,21 @@ export default class Game extends React.Component {
           this.setState({
             gameState: gameState,
             player: this.state.player === "white" ? "black" : "white",
-            showInvalidText: false
+            invalidMoveMessage: ''
           });
         } else {
           // Otherwise, the move is invalid
-          this.setState({ showInvalidText: true });
+          this.setState({ invalidMoveMessage: 'Invalid Move!' });
         }      
       });
+      */
   }
 
   render() {
     return (
       <View >
         <Text>Player: {this.state.player}</Text>
-        {
-          this.state.showInvalidText &&
-          <Text> Invalid Move! </Text>
-        }
+        <Text> {this.state.invalidMoveMessage} </Text>
         <Board gameState={this.state.gameState}
           updateGameState={this.updateGameState} />
       </View>
