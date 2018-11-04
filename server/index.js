@@ -115,8 +115,8 @@ websocket.on('connection', (socket) => {
           // Update move if move is valid
           if (validMove) {
             // Update gameState
-            redisClient.lset('gameState', req.body.startCell, JSON.stringify({ ...firstCell, piece: null }));
-            redisClient.lset('gameState', req.body.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
+            redisClient.lset('gameState', data.startCell, JSON.stringify({ ...firstCell, piece: null }));
+            redisClient.lset('gameState', data.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
 
             // Send instruction to plotter
             let instruction = generateInstruction(firstCell, secondCell);
