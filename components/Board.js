@@ -60,11 +60,11 @@ export default class Board extends React.Component {
             return (
                 <StyledBoard>
                     {
-                        this.state.gameState &&
+                        reverseState &&
                         reverseState.map((cell, index) => {
                             return (<Cell
-                                key={index}
-                                id={index}
+                                key={(7-parseInt(index/8)) * 8 + index % 8}
+                                id={(7-parseInt(index/8)) * 8 + index % 8}
                                 col={cell.col}
                                 row={cell.row}
                                 piece={cell.piece}

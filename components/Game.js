@@ -59,6 +59,7 @@ export default class Game extends React.Component {
       <View >
         <Text>Player: {this.state.player}</Text>
         <Text> {this.state.invalidMoveMessage} </Text>
+		<Text>Me: {this.me} </Text>
         <Board gameState={this.state.gameState}
           updateGameState={this.updateGameState}
           me={this.me}/>
