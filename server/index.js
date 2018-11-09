@@ -1,14 +1,57 @@
 const express = require("express");
-const http = require('http')
+const http = require('http');
 var socketio = require('socket.io');
 const fetch = require('node-fetch');
 const BodyParser = require("body-parser");
+
+var stockfish = require("stockfish");
+var engine = stockfish();
+var uciok = false;
+var position = "startpos";
 
 const app = express();
 app.use(BodyParser.urlencoded({ extended: false }));
 app.use(BodyParser.json());
 const server = http.Server(app);
 const websocket = socketio(server);
+
+//-------------------------StockFish Try--------------------
+function send(str)
+{
+    console.log("Sending: " + str)
+    engine.postMessage(str);
+}
+
+engine.onmessage= function (line){
+    var match;
+    console.log("Line: " + line);
+
+    if (typeof line !== "string") {
+        console.log("Got line:");
+        console.log(typeof line);
+        console.log(line);
+        return;
+    }
+
+    if (!uciok && line === "uciok") {
+        uciok = true;
+        if (position) {
+            send("position " + position);
+            //   send("eval");
+            send("d");
+        }
+
+        send("go movetimes 4000");
+    } else if (line.indexOf("bestmove") > -1) {
+        match = line.match(/bestmove\s+(\S+)/);
+        if (match) {
+            console.log("Best move: " + match[1]);
+            process.exit();
+        }
+    }
+};
+
+send("uciok");
 
 // Set up Redis Client
 const redisClient = require('redis').createClient(process.env.REDIS_URL);
