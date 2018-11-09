@@ -88,9 +88,18 @@ app.get('/', (req, res) => {
   res.send('API working');
 });
 
+var numPlayer = 0;
 // When a socket is connected ...
 websocket.on('connection', (socket) => {
 
+  numPlayer++;
+  if (numPlayer === 1) {
+    socket.emit('setPlayer', 'white');
+  } else if (numPlayer === 2) {
+    socket.emit('setPlayer', 'black');
+  } else if (numPlayer > 2) {
+    socket.emit('setPlayer', 'viewer');
+  }
   // ... Get game state and send to client
   redisClient.lrange('gameState', 0, -1, function (err, reply) {
     socket.emit('gameState', reply.map(obj => JSON.parse(obj)));

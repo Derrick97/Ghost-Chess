@@ -12,7 +12,8 @@ export default class Game extends React.Component {
       gameState: null,
       player: 'black',
       invalidMoveMessage: '',
-    }
+    };
+    this.me = '';
     this.updateGameState = this.updateGameState.bind(this);
     // Establish socket connection
     this.socket = io('https://ghost-chess.herokuapp.com', {
@@ -36,6 +37,10 @@ export default class Game extends React.Component {
         this.setState({ invalidMoveMessage: 'Invalid Move!' });
       }     
     });
+
+    this.socket.on('setPlayer', data => {
+      this.me = data;
+    });
   }
 
   updateGameState(startCell, endCell) {
@@ -55,7 +60,8 @@ export default class Game extends React.Component {
         <Text>Player: {this.state.player}</Text>
         <Text> {this.state.invalidMoveMessage} </Text>
         <Board gameState={this.state.gameState}
-          updateGameState={this.updateGameState} />
+          updateGameState={this.updateGameState}
+          me={this.me}/>
       </View>
     );
   }
