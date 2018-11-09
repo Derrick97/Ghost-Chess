@@ -8,7 +8,7 @@
 
 struct command {
   int direction = 4;
-  int distance = 0;
+  int distance = -1;
   boolean magnet =false;
 }commands[25];
 
@@ -19,7 +19,7 @@ MeStepper stepper_1(1);
 MeStepper stepper_2(2);
 double MaxSpeed = 100.0;
 double Speed = 100.0;
-double CellSize = 100.0;
+double HalfCellSize = 116.7;
 MeLimitSwitch sw_3_1(3,1);
 MeLimitSwitch sw_3_2(3,2);
 MeLimitSwitch sw_6_1(6,1);
@@ -28,8 +28,9 @@ char buffer[4];
 // index: how many command in commands
 int WriteIndex=0;
 int ReadIndex=0;
-bool available= true;
-
+bool motorAvailable = true;
+bool validString = true;
+bool serialIsAvailable = true;
 
 
 void setup(){
@@ -39,13 +40,21 @@ void setup(){
 }
 
 void loop(){
+    if (serialIsAvailable) {
       while(Serial.available()){
         delay(1000);
         if(Serial.available()>=4){
+          serialIsAvailable = false;
           Serial.println("wp 1");
           Serial.readBytes(buffer,4);
           char term = buffer[3];
-          if (term=='#'){
+//          int dir = buffer[0] - 48;
+//          int dis = buffer[1] - 48;
+//          int mag = buffer[2] - 48;
+//          if (dir < 0 || dir > 7 || mag < 0 || mag > 1) {
+//            validString = false;
+//          }
+          if (term=='#' && validString){
           commands[WriteIndex].direction = buffer[0]-48;
           commands[WriteIndex].distance = buffer[1]-48;
           commands[WriteIndex].magnet = buffer[2]-48;
@@ -67,15 +76,16 @@ void loop(){
           }
         
         }
+      }
         //clearing serial data
 //        else{
 //          Serial.print(Serial.available());
           
 //        }
   }
-       Serial.println(available);
-      if(commands[ReadIndex].distance!=0 && available){
-        available = false;
+//       Serial.println(motorAvailable);
+      if(commands[ReadIndex].distance!=-1 && motorAvailable){
+        motorAvailable = false;
        Serial.println("wp2");
        Serial.println(commands[ReadIndex].direction);
        Serial.println(commands[ReadIndex].distance);
@@ -109,15 +119,24 @@ void loop(){
       Serial.println(x);
       Serial.println("y:");
       Serial.println(y);
-      stepper_1.move(CellSize*x);
+      stepper_1.move(HalfCellSize*x);
       stepper_1.setMaxSpeed(MaxSpeed);
       stepper_1.setSpeed(Speed);
-      stepper_2.move(CellSize*y);
+      stepper_2.move(HalfCellSize*y);
       stepper_2.setMaxSpeed(MaxSpeed);
       stepper_2.setSpeed(Speed);
       
       ReadIndex++;
-      }  
+      } else if (motorAvailable == true) {
+        serialIsAvailable = true;
+        if (ReadIndex != 0) {
+            WriteIndex = 0;
+            ReadIndex = 0;
+            for (int i = 0; i < 25; i++) {
+              commands[i].distance = -1;
+            }
+         }
+      }
       delay(10);
      _loop();
 //}
@@ -135,7 +154,7 @@ void _loop(){
 bool steppe1 = stepper_1.runSpeedToPosition();
 bool steppe2 = stepper_2.runSpeedToPosition();
   if (!steppe2 && !steppe1){
-  available = true;
+  motorAvailable = true;
 //  Serial.println("available");
   }
 //  else{
