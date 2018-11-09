@@ -308,7 +308,7 @@ function validatePawn(firstCell, secondCell) {
   if (firstCell.piece.color === 'white') {
     let moveForward = firstCell.row < secondCell.row;
     // ... and it is in starting position ...
-    if (firstCell.row == 1) {
+    if (firstCell.row === 1) {
       return moveForward && (moveOne || moveTwo || capture);
     } else {
       return moveForward && (moveOne || capture);
@@ -329,51 +329,66 @@ function validatePawn(firstCell, secondCell) {
  * Functions for Generating Instruction to Plotter
  ************************************************************************************************************/
 // TODO: Refractor function, make direction an enum.
-// function generateMoveInstruction(direction, distance, magnetStatus){
-//   switch (direction){
-//      case 'north':
-//      return 0;
-//      case 
-//   }
-// }
+ function generateMoveInstruction(from, to, pistolStatus){
+   let startX = from.row;
+   let startY = from.col;
+   let endX = to.row;
+   let endY = to.col;
+   let command = '';
+   if(endX <= startX){
+     command = command + '0' + (startX - endX)*2 + pistolStatus + '#'
+   } else {
+     command = command + '4' + (endX - startX)*2 + pistolStatus + '#'
+   }
+   if(endY <= startY){
+     command = command + '6' + (startY - endY)*2 + pistolStatus + '#'
+   } else {
+     command = command + '2' + (endY - startY)*2 + pistolStatus + '#'
+   }
+   return command;
+ }
 
 
 // TODO: Return instruction code to plotter
 function generateInstruction(startCell, endCell) {
-  let instructionSet = ''
-  let startRow = startCell.row
-  let startCol = startCell.col
-  let endRow = endCell.row
-  let endCol = endCell.col
-  // 1. Start from (0.0), go to (startRow, 0): Goes South, move "startRow" units, turn off the magnets.
-  let gotoStartRow = '4' + startRow + '0#'
-  // 2. From (startRow, 0) go to (startRow, startCol): Goes East, move "startCol" units, turn off the magnets.
-  let gotoStartCol = '2' + startCol + '0#'
-  // 3. Then from (startRow, startCol) to (endRow, startCol)
-  let startToEndRow = ''
-  let rowDistance = endRow - startRow;
-  if (rowDistance <= 0) {
-    rowDistance = rowDistance * -1;
-    // rowDistance <=0: North, move "rowDistance" units, turn on magnets.
-      startToEndRow = '0' + rowDistance + '1#'
-  } else {
-    // Else go south, others remain the same.
-      startToEndRow = '4' + rowDistance + '1#'
-  }
-  // 4. Then from (endRow, startCol) to (endRow, endCol)
-  let startToEndCol = ''
-  let colDistance = endCol - startCol;
-  if (colDistance <= 0) {
-    colDistance = colDistance * -1;
-    // colDistance <=0: West, move "colDistance" units, turn on magnets.
-    startToEndCol = '6' + colDistance + '1#'
-  } else {
-    // Else go East, others remain the same.
-      startToEndCol = '2' + colDistance + '1#'
-  }
-  // 5. Go back to original point.
-  let resetToOriginal = '000#';
-
-  instructionSet = gotoStartRow + gotoStartCol + startToEndRow + startToEndCol;
-  return instructionSet;
+   let origin = {col:0, rol:0, piece:null};
+   return (generateMoveInstruction(origin, startCell, 0)
+       + generateMoveInstruction(startCell, endCell, 1)
+       + generateMoveInstruction(endCell, origin, 0));
+  // let instructionSet = '';
+  // let startRow = startCell.row;
+  // let startCol = startCell.col;
+  // let endRow = endCell.row;
+  // let endCol = endCell.col;
+  // // 1. Start from (0.0), go to (startRow, 0): Goes South, move "startRow" units, turn off the magnets.
+  // let gotoStartRow = '4' + startRow + '0#';
+  // // 2. From (startRow, 0) go to (startRow, startCol): Goes East, move "startCol" units, turn off the magnets.
+  // let gotoStartCol = '2' + startCol + '0#';
+  // // 3. Then from (startRow, startCol) to (endRow, startCol)
+  // let startToEndRow = '';
+  // let rowDistance = endRow - startRow;
+  // if (rowDistance <= 0) {
+  //   rowDistance = rowDistance * -1;
+  //   // rowDistance <=0: North, move "rowDistance" units, turn on magnets.
+  //     startToEndRow = '0' + rowDistance + '1#'
+  // } else {
+  //   // Else go south, others remain the same.
+  //     startToEndRow = '4' + rowDistance + '1#'
+  // }
+  // // 4. Then from (endRow, startCol) to (endRow, endCol)
+  // let startToEndCol = '';
+  // let colDistance = endCol - startCol;
+  // if (colDistance <= 0) {
+  //   colDistance = colDistance * -1;
+  //   // colDistance <=0: West, move "colDistance" units, turn on magnets.
+  //   startToEndCol = '6' + colDistance + '1#'
+  // } else {
+  //   // Else go East, others remain the same.
+  //     startToEndCol = '2' + colDistance + '1#'
+  // }
+  // // 5. Go back to original point.
+  // let resetToOriginal = '000#';
+  //
+  // instructionSet = gotoStartRow + gotoStartCol + startToEndRow + startToEndCol;
+  // return instructionSet;
 }
