@@ -16,16 +16,43 @@ const server = http.Server(app);
 const websocket = socketio(server);
 
 //-------------------------StockFish Try--------------------
+function translateMoveToUCI(firstCell, secondCell, promotion_type){
+  let f_row = firstCell.row;
+  let f_col = 'a' + firstCell.col;
+  let s_row = secondCell.row;
+  let s_col = 'a' + secondCell.col;
+  let command = f_row.toString() + f_col + s_row.toString() + s_col;
+  // Promotion of pawn.
+  if(firstCell.piece.type === 'p'){
+    if((firstCell.piece.color === 'black' && s_row === 7) || (firstCell.piece.color === 'white' && s_row === 0)){
+       command += promotion_type;
+    }
+  }
+  return command;
+}
+
+function translateMoveToGameState(uci_string) {
+    let f_col = uci_string[0];
+    let f_row = uci_string[1];
+    let s_col = uci_string[2];
+    let s_rol = uci_string[3];
+    let promotion = null;
+  if(uci_string.length === 5){
+    promotion = uci_string[4];
+  }
+  // TODO: Need to get piece type from gamestate to get a full cell, and update the gamestate.
+}
+
 function send(str)
 {
     console.log("Sending: " + str)
     engine.postMessage(str);
 }
 
+let fen = "";
+let current_player = "";
+
 engine.onmessage= function (line){
-    let match = "";
-    let fen = "";
-    let current_player = "";
     console.log("Line: " + line);
 
     if (typeof line !== "string") {
@@ -39,24 +66,24 @@ engine.onmessage= function (line){
         uciok = true;
         if (position) {
             send("position " + position);
-            //   send("eval");
             send("d");
+            // d will return the fen and will be caught by the next block of code.
+            // d should be sent every time someone make a move. Here is the only time at uciok, because we need the initial fen.
         }
-
-        send("go movetimes 4000");
     }
 
     if(uciok && line.indexOf("Fen") > -1){
         fen = line.match(/Fen: [a-zA-Z0-9 \/]+/)[0].substring(5);
         current_player = line.match(/ [bw] /)[0];
-        // Need to deal with current player here.
-        send("position " + fen +" moves " + match[0])
+        // TODO: If the current player is AI, then calculate; else just store the current fen.
+        // send("go movetimes 4000");
     }
     else if (line.indexOf("bestmove") > -1) {
         match = line.match(/bestmove\s+(\S+)/);
         if (match) {
             console.log("Best move: " + match[1]);
-            send(d);
+            send("position " + fen +" moves " + match[1])
+            send('d');
         }
     }
 };
@@ -171,7 +198,9 @@ websocket.on('connection', (socket) => {
             // Update gameState
             redisClient.lset('gameState', data.startCell, JSON.stringify({ ...firstCell, piece: null }));
             redisClient.lset('gameState', data.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
-
+            //Update game state in stockfish.
+            send("position "+ fen + " moves "+ translateMove(data.startCell, data.endCell, null));
+            send('d');
             // Send instruction to plotter
             let instruction = generateInstruction(firstCell, secondCell);
             // This address changes everytime when ngrok restarts
