@@ -23,7 +23,9 @@ function send(str)
 }
 
 engine.onmessage= function (line){
-    var match;
+    let match = "";
+    let fen = "";
+    let current_player = "";
     console.log("Line: " + line);
 
     if (typeof line !== "string") {
@@ -42,11 +44,19 @@ engine.onmessage= function (line){
         }
 
         send("go movetimes 4000");
-    } else if (line.indexOf("bestmove") > -1) {
+    }
+
+    if(uciok && line.indexOf("Fen") > -1){
+        fen = line.match(/Fen: [a-zA-Z0-9 \/]+/)[0].substring(5);
+        current_player = line.match(/ [bw] /)[0];
+        // Need to deal with current player here.
+        send("position " + fen +" moves " + match[0])
+    }
+    else if (line.indexOf("bestmove") > -1) {
         match = line.match(/bestmove\s+(\S+)/);
         if (match) {
             console.log("Best move: " + match[1]);
-            process.exit();
+            send(d);
         }
     }
 };
