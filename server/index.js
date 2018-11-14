@@ -88,7 +88,7 @@ engine.onmessage= function (line){
     }
 };
 
-send("uciok");
+send("uci");
 
 // Set up Redis Client
 const redisClient = require('redis').createClient(process.env.REDIS_URL);
