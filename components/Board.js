@@ -47,6 +47,7 @@ export default class Board extends React.Component {
             }
         } else {
             // Otherwise, chess piece is already selected ...
+            this.setState({highlightedCells: []});
             this.endCell = index;
             this.props.updateGameState(this.startCell, this.endCell);
             this.startCell = null;
@@ -55,7 +56,7 @@ export default class Board extends React.Component {
     }
 
     render() {
-        if (this.props.me === 'white') {
+        if (this.props.me === 'black') {
             let reverseState = this.reverseBoard(this.state.gameState);
             return (
                 <StyledBoard>

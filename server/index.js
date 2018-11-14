@@ -16,31 +16,19 @@ const server = http.Server(app);
 const websocket = socketio(server);
 
 //-------------------------StockFish Try--------------------
-function translateMoveToUCI(firstCell, secondCell, promotion_type){
-  let f_row = firstCell.row;
-  let f_col = 'a' + firstCell.col;
-  let s_row = secondCell.row;
-  let s_col = 'a' + secondCell.col;
-  let command = f_row.toString() + f_col + s_row.toString() + s_col;
-  // Promotion of pawn.
-  if(firstCell.piece.type === 'p'){
-    if((firstCell.piece.color === 'black' && s_row === 7) || (firstCell.piece.color === 'white' && s_row === 0)){
-       command += promotion_type;
+function translateMoveToUCI(firstCell, secondCell, promotion_type) {
+    let f_row = firstCell.row;
+    let f_col = 'a' + firstCell.col;
+    let s_row = secondCell.row;
+    let s_col = 'a' + secondCell.col;
+    let command = f_row.toString() + f_col + s_row.toString() + s_col;
+    // Promotion of pawn.
+    if (firstCell.piece.type === 'p') {
+        if ((firstCell.piece.color === 'black' && s_row === 7) || (firstCell.piece.color === 'white' && s_row === 0)) {
+            command += promotion_type;
+        }
     }
-  }
-  return command;
-}
-
-function translateMoveToGameState(uci_string) {
-    let f_col = uci_string[0];
-    let f_row = uci_string[1];
-    let s_col = uci_string[2];
-    let s_rol = uci_string[3];
-    let promotion = null;
-  if(uci_string.length === 5){
-    promotion = uci_string[4];
-  }
-  // TODO: Need to get piece type from gamestate to get a full cell, and update the gamestate.
+    return command;
 }
 
 function send(str)
@@ -49,46 +37,7 @@ function send(str)
     engine.postMessage(str);
 }
 
-let fen = "";
 let current_player = "";
-
-engine.onmessage= function (line){
-    console.log("Line: " + line);
-
-    if (typeof line !== "string") {
-        console.log("Got line:");
-        console.log(typeof line);
-        console.log(line);
-        return;
-    }
-
-    if (!uciok && line === "uciok") {
-        uciok = true;
-        if (position) {
-            send("position " + position);
-            send("d");
-            // d will return the fen and will be caught by the next block of code.
-            // d should be sent every time someone make a move. Here is the only time at uciok, because we need the initial fen.
-        }
-    }
-
-    if(uciok && line.indexOf("Fen") > -1){
-        fen = line.match(/Fen: [a-zA-Z0-9 \/]+/)[0].substring(5);
-        current_player = line.match(/ [bw] /)[0];
-        // TODO: If the current player is AI, then calculate; else just store the current fen.
-        // send("go movetimes 4000");
-    }
-    else if (line.indexOf("bestmove") > -1) {
-        match = line.match(/bestmove\s+(\S+)/);
-        if (match) {
-            console.log("Best move: " + match[1]);
-            send("position " + fen +" moves " + match[1])
-            send('d');
-        }
-    }
-};
-
-send("uci");
 
 // Set up Redis Client
 const redisClient = require('redis').createClient(process.env.REDIS_URL);
@@ -96,22 +45,22 @@ redisClient.on('connect', () => console.log('Redis client connected'));
 redisClient.on('error', err => console.log('Redis client error: ' + err));
 redisClient.flushall(function (err, res) {
   const gameState = [
-    { col: 0, row: 0, piece: { type: 'R', color: 'white' } },
-    { col: 1, row: 0, piece: { type: 'H', color: 'white' } },
-    { col: 2, row: 0, piece: { type: 'B', color: 'white' } },
-    { col: 3, row: 0, piece: { type: 'K', color: 'white' } },
-    { col: 4, row: 0, piece: { type: 'Q', color: 'white' } },
-    { col: 5, row: 0, piece: { type: 'B', color: 'white' } },
-    { col: 6, row: 0, piece: { type: 'H', color: 'white' } },
-    { col: 7, row: 0, piece: { type: 'R', color: 'white' } },
-    { col: 0, row: 1, piece: { type: 'P', color: 'white' } },
-    { col: 1, row: 1, piece: null },
-    { col: 2, row: 1, piece: { type: 'P', color: 'white' }  },
-    { col: 3, row: 1, piece: { type: 'P', color: 'white' }  },
-    { col: 4, row: 1, piece: null },
-    { col: 5, row: 1, piece: { type: 'P', color: 'white' }  },
-    { col: 6, row: 1, piece: null },
-    { col: 7, row: 1, piece: null },
+    { col: 0, row: 0, piece: { type: 'R', color: 'black' } },
+    { col: 1, row: 0, piece: { type: 'H', color: 'black' } },
+    { col: 2, row: 0, piece: { type: 'B', color: 'black' } },
+    { col: 3, row: 0, piece: { type: 'K', color: 'black' } },
+    { col: 4, row: 0, piece: { type: 'Q', color: 'black' } },
+    { col: 5, row: 0, piece: { type: 'B', color: 'black' } },
+    { col: 6, row: 0, piece: { type: 'H', color: 'black' } },
+    { col: 7, row: 0, piece: { type: 'R', color: 'black' } },
+    { col: 0, row: 1, piece: { type: 'P', color: 'black' } },
+    { col: 1, row: 1, piece: { type: 'P', color: 'black' } },
+    { col: 2, row: 1, piece: { type: 'P', color: 'black' }  },
+    { col: 3, row: 1, piece: { type: 'P', color: 'black' }  },
+    { col: 4, row: 1, piece: { type: 'P', color: 'black' } },
+    { col: 5, row: 1, piece: { type: 'P', color: 'black' }  },
+    { col: 6, row: 1, piece: { type: 'P', color: 'black' } },
+    { col: 7, row: 1, piece: { type: 'P', color: 'black' } },
     { col: 0, row: 2, piece: null },
     { col: 1, row: 2, piece: null },
     { col: 2, row: 2, piece: null },
@@ -144,22 +93,23 @@ redisClient.flushall(function (err, res) {
     { col: 5, row: 5, piece: null },
     { col: 6, row: 5, piece: null },
     { col: 7, row: 5, piece: null },
-    { col: 0, row: 6, piece: { type: 'P', color: 'black' } },
-    { col: 1, row: 6, piece: null },
-    { col: 2, row: 6, piece: null },
-    { col: 3, row: 6, piece: null },
-    { col: 4, row: 6, piece: { type: 'P', color: 'black' } },
-    { col: 5, row: 6, piece: null },
-    { col: 6, row: 6, piece: { type: 'P', color: 'black' } },
-    { col: 7, row: 6, piece: null },
-    { col: 0, row: 7, piece: { type: 'R', color: 'black' } },
-    { col: 1, row: 7, piece: { type: 'H', color: 'black' } },
-    { col: 2, row: 7, piece: { type: 'B', color: 'black' } },
-    { col: 3, row: 7, piece: { type: 'K', color: 'black' } },
-    { col: 4, row: 7, piece: { type: 'Q', color: 'black' } },
-    { col: 5, row: 7, piece: { type: 'B', color: 'black' } },
-    { col: 6, row: 7, piece: { type: 'H', color: 'black' } },
-    { col: 7, row: 7, piece: { type: 'R', color: 'black' } },
+    { col: 0, row: 6, piece: { type: 'P', color: 'white' } },
+    { col: 1, row: 6, piece: { type: 'P', color: 'white' } },
+    { col: 2, row: 6, piece: { type: 'P', color: 'white' } },
+    { col: 3, row: 6, piece: { type: 'P', color: 'white' } },
+    { col: 4, row: 6, piece: { type: 'P', color: 'white' } },
+    { col: 5, row: 6, piece: { type: 'P', color: 'white' } },
+    { col: 6, row: 6, piece: { type: 'P', color: 'white' } },
+    { col: 7, row: 6, piece: { type: 'P', color: 'white' } },
+    { col: 7, row: 6, piece: { type: 'P', color: 'white' } },
+    { col: 0, row: 7, piece: { type: 'R', color: 'white' } },
+    { col: 1, row: 7, piece: { type: 'H', color: 'white' } },
+    { col: 2, row: 7, piece: { type: 'B', color: 'white' } },
+    { col: 3, row: 7, piece: { type: 'K', color: 'white' } },
+    { col: 4, row: 7, piece: { type: 'Q', color: 'white' } },
+    { col: 5, row: 7, piece: { type: 'B', color: 'white' } },
+    { col: 6, row: 7, piece: { type: 'H', color: 'white' } },
+    { col: 7, row: 7, piece: { type: 'R', color: 'white' } },
   ];
   redisClient.rpush("gameState", gameState.map(obj => JSON.stringify(obj)));
 });
@@ -168,7 +118,7 @@ app.get('/', (req, res) => {
   res.send('API working');
 });
 
-var numPlayer = 0;
+let numPlayer = 0;
 // When a socket is connected ...
 websocket.on('connection', (socket) => {
 
@@ -177,6 +127,46 @@ websocket.on('connection', (socket) => {
     socket.emit('setPlayer', 'white');
   } else if (numPlayer === 2) {
     socket.emit('setPlayer', 'black');
+    //StockFish AI Engine
+      engine.onmessage = function (line){
+          console.log("Line: " + line);
+
+          if (typeof line !== "string") {
+              console.log("Got line:");
+              console.log(typeof line);
+              console.log(line);
+              return;
+          }
+
+          if (!uciok && line === "uciok") {
+              uciok = true;
+              if (position) {
+                  send("position " + position);
+                  send("d");
+                  // d will return the fen and will be caught by the next block of code.
+                  // d should be sent every time someone make a move. Here is the only time at uciok, because we need the initial fen.
+              }
+          }
+
+          if(uciok && line.indexOf("Fen") > -1){
+              position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
+              current_player = position[position.length-1];
+              if (current_player === 'b') {
+                  send("go movetimes 4000");
+              }
+          }
+          else if (line.indexOf("bestmove") > -1) {
+              let match = line.match(/bestmove\s+(\S+)/);
+              if (match) {
+                  console.log("Best move: " + match[1]);
+                  send("position fen " + position + " moves " + match[1]);
+                  send('d');
+              }
+              socket.emit('bestMove', match[1]);
+          }
+      };
+
+      send("uci");
   } else if (numPlayer > 2) {
     socket.emit('setPlayer', 'viewer');
   }
@@ -208,7 +198,7 @@ websocket.on('connection', (socket) => {
             redisClient.lset('gameState', data.startCell, JSON.stringify({ ...firstCell, piece: null }));
             redisClient.lset('gameState', data.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
             //Update game state in stockfish.
-            send("position "+ fen + " moves "+ translateMove(data.startCell, data.endCell, null));
+            send("position fen "+ position + " moves "+ translateMoveToUCI(data.startCell, data.endCell, null));
             send('d');
             // Send instruction to plotter
             let instruction = generateInstruction(firstCell, secondCell);
