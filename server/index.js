@@ -39,7 +39,7 @@ function send(str)
 
 let current_player = "";
 
-// Set up Redis Client
+//Set up Redis Client
 const redisClient = require('redis').createClient(process.env.REDIS_URL);
 redisClient.on('connect', () => console.log('Redis client connected'));
 redisClient.on('error', err => console.log('Redis client error: ' + err));
