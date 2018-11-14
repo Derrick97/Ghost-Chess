@@ -73,8 +73,8 @@ engine.onmessage= function (line){
     }
 
     if(uciok && line.indexOf("Fen") > -1){
-        fen = line.match(/Fen: [a-zA-Z0-9 \/]+/)[0].substring(5);
-        current_player = line.match(/ [bw] /)[0];
+        fen = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
+        current_player = fen[fen.length-1];
         // TODO: If the current player is AI, then calculate; else just store the current fen.
         // send("go movetimes 4000");
     }
