@@ -101,7 +101,6 @@ redisClient.flushall(function (err, res) {
     { col: 5, row: 6, piece: { type: 'P', color: 'white' } },
     { col: 6, row: 6, piece: { type: 'P', color: 'white' } },
     { col: 7, row: 6, piece: { type: 'P', color: 'white' } },
-    { col: 7, row: 6, piece: { type: 'P', color: 'white' } },
     { col: 0, row: 7, piece: { type: 'R', color: 'white' } },
     { col: 1, row: 7, piece: { type: 'H', color: 'white' } },
     { col: 2, row: 7, piece: { type: 'B', color: 'white' } },
