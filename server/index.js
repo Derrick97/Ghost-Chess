@@ -15,29 +15,29 @@ app.use(BodyParser.json());
 const server = http.Server(app);
 const websocket = socketio(server);
 
-//-------------------------StockFish Try--------------------
-function translateMoveToUCI(firstCell, secondCell, promotion_type) {
-    let f_row = firstCell.row;
-    let f_col = 'a' + firstCell.col;
-    let s_row = secondCell.row;
-    let s_col = 'a' + secondCell.col;
-    let command = f_row.toString() + f_col + s_row.toString() + s_col;
-    // Promotion of pawn.
-    if (firstCell.piece.type === 'p') {
-        if ((firstCell.piece.color === 'black' && s_row === 7) || (firstCell.piece.color === 'white' && s_row === 0)) {
-            command += promotion_type;
-        }
-    }
-    return command;
-}
-
-function send(str)
-{
-    console.log("Sending: " + str)
-    engine.postMessage(str);
-}
-
-let current_player = "";
+// //-------------------------StockFish Try--------------------
+// function translateMoveToUCI(firstCell, secondCell, promotion_type) {
+//     let f_row = firstCell.row;
+//     let f_col = 'a' + firstCell.col;
+//     let s_row = secondCell.row;
+//     let s_col = 'a' + secondCell.col;
+//     let command = f_row.toString() + f_col + s_row.toString() + s_col;
+//     // Promotion of pawn.
+//     if (firstCell.piece.type === 'p') {
+//         if ((firstCell.piece.color === 'black' && s_row === 7) || (firstCell.piece.color === 'white' && s_row === 0)) {
+//             command += promotion_type;
+//         }
+//     }
+//     return command;
+// }
+//
+// function send(str)
+// {
+//     console.log("Sending: " + str)
+//     engine.postMessage(str);
+// }
+//
+// let current_player = "";
 
 //Set up Redis Client
 const redisClient = require('redis').createClient(process.env.REDIS_URL);
