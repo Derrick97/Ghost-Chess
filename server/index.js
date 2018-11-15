@@ -4,8 +4,8 @@ var socketio = require('socket.io');
 const fetch = require('node-fetch');
 const BodyParser = require("body-parser");
 
-var stockfish = require("stockfish");
-var engine = stockfish();
+//var stockfish = require("stockfish");
+//var engine = stockfish();
 var uciok = false;
 var position = "startpos";
 
