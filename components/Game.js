@@ -27,6 +27,7 @@ export default class Game extends React.Component {
         // When socket recieves gameState event from server ...
         this.socket.on('gameState', data => {
             // If server returns list of GameState, indicating move is valid
+            console.log("data length is "+ data.length);
             if (data.length) {
                 // Update the gamestate and change player
                 this.setState({

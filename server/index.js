@@ -385,7 +385,7 @@ function validatePawn(firstCell, secondCell) {
     && (rowDifference === 1) && (colDifference === 1)
 
   //If the piece is white ...
-  if (firstCell.piece.color === 'white') {
+  if (firstCell.piece.color === 'black') {
     let moveForward = firstCell.row < secondCell.row;
     // ... and it is in starting position ...
     if (firstCell.row === 1) {

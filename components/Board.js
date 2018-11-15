@@ -244,7 +244,7 @@ export default class Board extends React.Component {
 
         let col = cell.col;
         //The piece is white
-        if (cell.piece.color === 'white') {
+        if (cell.piece.color === 'black') {
             //On the starting row
             if (cell.row === 1) {
                 let row = cell.row + 2;
