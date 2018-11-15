@@ -127,45 +127,45 @@ websocket.on('connection', (socket) => {
   } else if (numPlayer === 2) {
     socket.emit('setPlayer', 'black');
     //StockFish AI Engine
-      engine.onmessage = function (line){
-          console.log("Line: " + line);
-
-          if (typeof line !== "string") {
-              console.log("Got line:");
-              console.log(typeof line);
-              console.log(line);
-              return;
-          }
-
-          if (!uciok && line === "uciok") {
-              uciok = true;
-              if (position) {
-                  send("position " + position);
-                  send("d");
-                  // d will return the fen and will be caught by the next block of code.
-                  // d should be sent every time someone make a move. Here is the only time at uciok, because we need the initial fen.
-              }
-          }
-
-          if(uciok && line.indexOf("Fen") > -1){
-              position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
-              current_player = position[position.length-1];
-              if (current_player === 'b') {
-                  send("go movetimes 4000");
-              }
-          }
-          else if (line.indexOf("bestmove") > -1) {
-              let match = line.match(/bestmove\s+(\S+)/);
-              if (match) {
-                  console.log("Best move: " + match[1]);
-                  send("position fen " + position + " moves " + match[1]);
-                  send('d');
-              }
-              socket.emit('bestMove', match[1]);
-          }
-      };
-
-      send("uci");
+    //   engine.onmessage = function (line){
+    //       console.log("Line: " + line);
+    //
+    //       if (typeof line !== "string") {
+    //           console.log("Got line:");
+    //           console.log(typeof line);
+    //           console.log(line);
+    //           return;
+    //       }
+    //
+    //       if (!uciok && line === "uciok") {
+    //           uciok = true;
+    //           if (position) {
+    //               send("position " + position);
+    //               send("d");
+    //               // d will return the fen and will be caught by the next block of code.
+    //               // d should be sent every time someone make a move. Here is the only time at uciok, because we need the initial fen.
+    //           }
+    //       }
+    //
+    //       if(uciok && line.indexOf("Fen") > -1){
+    //           position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
+    //           current_player = position[position.length-1];
+    //           if (current_player === 'b') {
+    //               send("go movetimes 4000");
+    //           }
+    //       }
+    //       else if (line.indexOf("bestmove") > -1) {
+    //           let match = line.match(/bestmove\s+(\S+)/);
+    //           if (match) {
+    //               console.log("Best move: " + match[1]);
+    //               send("position fen " + position + " moves " + match[1]);
+    //               send('d');
+    //           }
+    //           socket.emit('bestMove', match[1]);
+    //       }
+    //   };
+    //
+    //   send("uci");
   } else if (numPlayer > 2) {
     socket.emit('setPlayer', 'viewer');
   }
@@ -197,8 +197,8 @@ websocket.on('connection', (socket) => {
             redisClient.lset('gameState', data.startCell, JSON.stringify({ ...firstCell, piece: null }));
             redisClient.lset('gameState', data.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
             //Update game state in stockfish.
-            send("position fen "+ position + " moves "+ translateMoveToUCI(data.startCell, data.endCell, null));
-            send('d');
+            // send("position fen "+ position + " moves "+ translateMoveToUCI(data.startCell, data.endCell, null));
+            // send('d');
             // Send instruction to plotter
             let instruction = generateInstruction(firstCell, secondCell);
             // This address changes everytime when ngrok restarts
