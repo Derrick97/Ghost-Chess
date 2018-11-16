@@ -110,6 +110,7 @@ let numPlayer = 0;
 // When a socket is connected ...
 websocket.on('connection', (socket) => {
       engine.onmessage = function (line){
+        socket.emit('bestMove', "hahahahahaha");
           console.log("Line: " + line);
 
           if (typeof line !== "string") {
