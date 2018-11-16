@@ -3,11 +3,10 @@ const http = require('http');
 var socketio = require('socket.io');
 const fetch = require('node-fetch');
 const BodyParser = require("body-parser");
-
-var stockfish = require("stockfish");
-var engine = stockfish();
-var uciok = false;
-var position = "startpos";
+let stockfish = require("stockfish");
+let engine = stockfish();
+let uciok = false;
+let position = "startpos";
 
 const app = express();
 app.use(BodyParser.urlencoded({ extended: false }));
@@ -16,24 +15,16 @@ const server = http.Server(app);
 const websocket = socketio(server);
 
 //-------------------------StockFish Try--------------------
-function translateMoveToUCI(firstCell, secondCell, promotion_type) {
-    let f_row = firstCell.row;
+function translateMoveToUCI(firstCell, secondCell) {
+    let f_row = firstCell.row + 1;
     let f_col = 'a' + firstCell.col;
-    let s_row = secondCell.row;
+    let s_row = secondCell.row + 1;
     let s_col = 'a' + secondCell.col;
-    let command = f_row.toString() + f_col + s_row.toString() + s_col;
-    // Promotion of pawn.
-    if (firstCell.piece.type === 'p') {
-        if ((firstCell.piece.color === 'black' && s_row === 7) || (firstCell.piece.color === 'white' && s_row === 0)) {
-            command += promotion_type;
-        }
-    }
-    return command;
+    return f_row.toString() + f_col + s_row.toString() + s_col;
 }
 
 function send(str)
 {
-    console.log("Sending: " + str);
     engine.postMessage(str);
 }
 
@@ -118,51 +109,44 @@ app.get('/', (req, res) => {
 let numPlayer = 0;
 // When a socket is connected ...
 websocket.on('connection', (socket) => {
+      engine.onmessage = function (line){
+          console.log("Line: " + line);
 
+          if (typeof line !== "string") {
+              console.log("Got line:");
+              console.log(typeof line);
+              console.log(line);
+              return;
+          }
+          if (!uciok && line === "uciok") {
+              uciok = true;
+              if (position) {
+                  send("position " + position);
+                  send("d");
+                  // d will return the fen and will be caught by the next block of code.
+                  // d should be sent every time someone make a move. Here is the only time at uciok, because we need the initial fen.
+              }
+          }
+          if(uciok && line.indexOf("Fen") > -1){
+              position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
+              if (position[position.length-1] === 'b') {
+                  send("go movetimes 4000");
+              }
+          }
+          else if (line.indexOf("bestmove") > -1) {
+              let match = line.match(/bestmove\s+(\S+)/);
+              if (match) {
+                  socket.emit('bestMove', match[1]);
+              }
+          }
+      };
   numPlayer++;
   if (numPlayer === 1) {
     socket.emit('setPlayer', 'white');
   } else if (numPlayer === 2) {
     socket.emit('setPlayer', 'black');
     //StockFish AI Engine
-    //   engine.onmessage = function (line){
-    //       console.log("Line: " + line);
-    //
-    //       if (typeof line !== "string") {
-    //           console.log("Got line:");
-    //           console.log(typeof line);
-    //           console.log(line);
-    //           return;
-    //       }
-    //
-    //       if (!uciok && line === "uciok") {
-    //           uciok = true;
-    //           if (position) {
-    //               send("position " + position);
-    //               send("d");
-    //               // d will return the fen and will be caught by the next block of code.
-    //               // d should be sent every time someone make a move. Here is the only time at uciok, because we need the initial fen.
-    //           }
-    //       }
-    //
-    //       if(uciok && line.indexOf("Fen") > -1){
-    //           position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
-    //           if (position[position.length-1] === 'b') {
-    //               send("go movetimes 4000");
-    //           }
-    //       }
-    //       else if (line.indexOf("bestmove") > -1) {
-    //           let match = line.match(/bestmove\s+(\S+)/);
-    //           if (match) {
-    //               console.log("Best move: " + match[1]);
-    //               send("position fen " + position + " moves " + match[1]);
-    //               send('d');
-    //           }
-    //           socket.emit('bestMove', match[1]);
-    //       }
-    //   };
-    //
-    //   send("uci");
+       send("uci");
   } else if (numPlayer > 2) {
     socket.emit('setPlayer', 'viewer');
   }
@@ -194,8 +178,8 @@ websocket.on('connection', (socket) => {
             redisClient.lset('gameState', data.startCell, JSON.stringify({ ...firstCell, piece: null }));
             redisClient.lset('gameState', data.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
             //Update game state in stockfish.
-            // send("position fen "+ position + " moves "+ translateMoveToUCI(data.startCell, data.endCell, null));
-            // send('d');
+            send("position fen "+ position + " moves "+ translateMoveToUCI(data.startCell, data.endCell));
+            send('d');
             // Send instruction to plotter
             let instruction = generateInstruction(firstCell, secondCell);
             // This address changes everytime when ngrok restarts
