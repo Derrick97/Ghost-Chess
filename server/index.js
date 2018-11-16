@@ -110,8 +110,6 @@ let numPlayer = 0;
 // When a socket is connected ...
 websocket.on('connection', (socket) => {
       engine.onmessage = function (line){
-        socket.emit('bestMove', "hahahahahaha");
-          console.log("Line: " + line);
 
           if (typeof line !== "string") {
               console.log("Got line:");
@@ -120,6 +118,7 @@ websocket.on('connection', (socket) => {
               return;
           }
           if (!uciok && line === "uciok") {
+              socket.emit('bestMove', "hahahahahaha");
               uciok = true;
               if (position) {
                   send("position " + position);
