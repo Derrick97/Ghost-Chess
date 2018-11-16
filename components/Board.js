@@ -33,20 +33,23 @@ export default class Board extends React.Component {
     }
 
     handleCellPress(index) {
-        // If no chess piece is selected ...
-        if (this.startCell === null) {
-            if (this.state.gameState[index].piece !== null) {
-                // If the player does not select his/her own chess, then do nothing
-                if (this.state.gameState[index].piece.color === this.props.me) {
-                    // ... set start cell to cell index
-                    this.startCell = index;
-                    let cell = this.state.gameState[index];
-                    let possibleMoves = this.findValidMove(cell);
-                    this.setState({highlightedCells: possibleMoves})
-                }
+        // If the player selects his/her own chess piece
+        if (this.state.gameState[index].piece !== null && this.state.gameState[index].piece.color === this.props.me) {
+            // Find possible moves for this chess piece
+            let cell = this.state.gameState[index];
+            let possibleMoves = this.findValidMove(cell);
+            // If there exists some possible moves for this chess piece
+            if (possibleMoves.length !== 0) {
+                // ... set start cell to cell index
+                this.startCell = index;
+                // highlight those possible moves
+                this.setState({highlightedCells: possibleMoves})
+            } else {
+                this.startCell = null;
+                this.setState({highlightedCells: []});
             }
-        } else {
-            // Otherwise, chess piece is already selected ...
+        // Otherwise, the player select other cells with his own chess piece been selected ...
+        } else if (this.startCell !== null) {
             this.setState({highlightedCells: []});
             this.endCell = index;
             this.props.updateGameState(this.startCell, this.endCell);
@@ -64,8 +67,8 @@ export default class Board extends React.Component {
                         reverseState &&
                         reverseState.map((cell, index) => {
                             return (<Cell
-                                key={(7-parseInt(index/8)) * 8 + index % 8}
-                                id={(7-parseInt(index/8)) * 8 + index % 8}
+                                key={(7 - parseInt(index / 8)) * 8 + index % 8}
+                                id={(7 - parseInt(index / 8)) * 8 + index % 8}
                                 col={cell.col}
                                 row={cell.row}
                                 piece={cell.piece}
@@ -195,7 +198,7 @@ export default class Board extends React.Component {
     }
 
     findValidHorse(cell) {
-        let moves = [[1, 2], [1, -2], [-1, 2], [-1, -2], [2, 1], [-2, 1], [2, -1], [-2, -1]]
+        let moves = [[1, 2], [1, -2], [-1, 2], [-1, -2], [2, 1], [-2, 1], [2, -1], [-2, -1]];
         let validMoves = [];
         for (let i = 0; i < moves.length; i++) {
             let col = cell.col + moves[i][0];
@@ -243,7 +246,7 @@ export default class Board extends React.Component {
         let validMoves = [];
 
         let col = cell.col;
-        //The piece is white
+        //The piece is black
         if (cell.piece.color === 'black') {
             //On the starting row
             if (cell.row === 1) {
@@ -272,7 +275,7 @@ export default class Board extends React.Component {
                 validMoves.push(possibleCapture);
             }
         } else {
-            //The piece is black, on starting row
+            //The piece is white, on starting row
             if (cell.row === 6) {
                 let row = cell.row - 2;
                 let cellInFront = this.getCell(col, cell.row - 1);
@@ -306,24 +309,24 @@ export default class Board extends React.Component {
      * Find Valid Moves - Helper Functions
      * **************************************************************************************************************/
 
-    // Returns the Cell object with the specified column and row from a given GameState
+// Returns the Cell object with the specified column and row from a given GameState
     getCell(col, row) {
         return this.state.gameState.find(function (cell) {
             return cell.col === col && cell.row === row
         });
     }
 
-    // Returns true if two cells have pieces with the same color.
+// Returns true if two cells have pieces with the same color.
     checkSamePieceColor(cell1, cell2) {
         return cell1.piece && cell2.piece && cell1.piece.color === cell2.piece.color;
     }
 
-    // Returns true if the col and row lies inside the board.
+// Returns true if the col and row lies inside the board.
     checkInsideBoard(col, row) {
         return col >= 0 && row >= 0 && col <= 7 && row <= 7;
     }
 
-    // Returns the valid cell if the possible move is a valid move.
+// Returns the valid cell if the possible move is a valid move.
     checkValidMove(cell, col, row) {
         if (this.checkInsideBoard(col, row)) {
             let possibleCell = this.getCell(col, row);

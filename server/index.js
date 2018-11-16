@@ -4,8 +4,8 @@ var socketio = require('socket.io');
 const fetch = require('node-fetch');
 const BodyParser = require("body-parser");
 
-//var stockfish = require("stockfish");
-//var engine = stockfish();
+var stockfish = require("stockfish");
+var engine = stockfish();
 var uciok = false;
 var position = "startpos";
 
@@ -15,29 +15,27 @@ app.use(BodyParser.json());
 const server = http.Server(app);
 const websocket = socketio(server);
 
-// //-------------------------StockFish Try--------------------
-// function translateMoveToUCI(firstCell, secondCell, promotion_type) {
-//     let f_row = firstCell.row;
-//     let f_col = 'a' + firstCell.col;
-//     let s_row = secondCell.row;
-//     let s_col = 'a' + secondCell.col;
-//     let command = f_row.toString() + f_col + s_row.toString() + s_col;
-//     // Promotion of pawn.
-//     if (firstCell.piece.type === 'p') {
-//         if ((firstCell.piece.color === 'black' && s_row === 7) || (firstCell.piece.color === 'white' && s_row === 0)) {
-//             command += promotion_type;
-//         }
-//     }
-//     return command;
-// }
-//
-// function send(str)
-// {
-//     console.log("Sending: " + str)
-//     engine.postMessage(str);
-// }
-//
-// let current_player = "";
+//-------------------------StockFish Try--------------------
+function translateMoveToUCI(firstCell, secondCell, promotion_type) {
+    let f_row = firstCell.row;
+    let f_col = 'a' + firstCell.col;
+    let s_row = secondCell.row;
+    let s_col = 'a' + secondCell.col;
+    let command = f_row.toString() + f_col + s_row.toString() + s_col;
+    // Promotion of pawn.
+    if (firstCell.piece.type === 'p') {
+        if ((firstCell.piece.color === 'black' && s_row === 7) || (firstCell.piece.color === 'white' && s_row === 0)) {
+            command += promotion_type;
+        }
+    }
+    return command;
+}
+
+function send(str)
+{
+    console.log("Sending: " + str);
+    engine.postMessage(str);
+}
 
 //Set up Redis Client
 const redisClient = require('redis').createClient(process.env.REDIS_URL);
@@ -149,8 +147,7 @@ websocket.on('connection', (socket) => {
     //
     //       if(uciok && line.indexOf("Fen") > -1){
     //           position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
-    //           current_player = position[position.length-1];
-    //           if (current_player === 'b') {
+    //           if (position[position.length-1] === 'b') {
     //               send("go movetimes 4000");
     //           }
     //       }
@@ -382,9 +379,8 @@ function validatePawn(firstCell, secondCell) {
   let moveTwo = colDifference === 0 && rowDifference === 2;
   // 3. Capture enemy piece
   let capture = secondCell.piece && (firstCell.piece.color !== secondCell.piece.color)
-    && (rowDifference === 1) && (colDifference === 1)
-
-  //If the piece is white ...
+    && (rowDifference === 1) && (colDifference === 1);
+  //If the piece is black ...
   if (firstCell.piece.color === 'black') {
     let moveForward = firstCell.row < secondCell.row;
     // ... and it is in starting position ...
@@ -394,7 +390,7 @@ function validatePawn(firstCell, secondCell) {
       return moveForward && (moveOne || capture);
     }
   } else {
-    //Otherwise. the piece is black
+    //Otherwise. the piece is white
     let moveForward = secondCell.row < firstCell.row;
     // ... and it is in starting position ...
     if (firstCell.row === 6) {

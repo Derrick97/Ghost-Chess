@@ -12,7 +12,6 @@ export default class Game extends React.Component {
         this.state = {
             gameState: null,
             player: 'black',
-            invalidMoveMessage: '',
         };
         this.me = '';
         this.bestMove = '';
@@ -27,18 +26,12 @@ export default class Game extends React.Component {
         // When socket recieves gameState event from server ...
         this.socket.on('gameState', data => {
             // If server returns list of GameState, indicating move is valid
-            console.log("data length is "+ data.length);
             if (data.length) {
                 // Update the gamestate and change player
                 this.setState({
                     gameState: data,
                     player: this.state.player === "white" ? "black" : "white",
-                    invalidMoveMessage: ''
                 });
-            } else {
-                // Otherwise, the move is invalid
-                this.setState({invalidMoveMessage: ''});
-                this.setState({invalidMoveMessage: 'Invalid Move!'});
             }
         });
 
@@ -66,7 +59,6 @@ export default class Game extends React.Component {
         return (
             <View>
                 <Text>Player: {this.state.player}</Text>
-                <Text> {this.state.invalidMoveMessage} </Text>
                 <Text>Me: {this.me} </Text>
                 <Board gameState={this.state.gameState}
                        updateGameState={this.updateGameState}
