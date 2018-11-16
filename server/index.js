@@ -118,7 +118,7 @@ websocket.on('connection', (socket) => {
               return;
           }
           if (!uciok && line === "uciok") {
-              socket.emit('bestMove', "hahahahahaha");
+              socket.emit('bestMove', line);
               uciok = true;
               if (position) {
                   send("position " + position);
@@ -128,6 +128,7 @@ websocket.on('connection', (socket) => {
               }
           }
           if(uciok && line.indexOf("Fen") > -1){
+              socket.emit('bestMove', line);
               position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
               if (position[position.length-1] === 'b') {
                   send("go movetimes 4000");
@@ -143,6 +144,7 @@ websocket.on('connection', (socket) => {
   numPlayer++;
   if (numPlayer === 1) {
     socket.emit('setPlayer', 'white');
+      send("uci");
   } else if (numPlayer === 2) {
     socket.emit('setPlayer', 'black');
     //StockFish AI Engine
