@@ -16,9 +16,9 @@ const websocket = socketio(server);
 
 //-------------------------StockFish Try--------------------
 function translateMoveToUCI(firstCell, secondCell) {
-    let f_row = firstCell.row + 1;
+    let f_row = 8 - firstCell.row;
     let f_col = 'a' + firstCell.col;
-    let s_row = secondCell.row + 1;
+    let s_row = 8 - secondCell.row;
     let s_col = 'a' + secondCell.col;
     return f_row.toString() + f_col + s_row.toString() + s_col;
 }
