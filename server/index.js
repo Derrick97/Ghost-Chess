@@ -126,8 +126,8 @@ websocket.on('connection', (socket) => {
           }
           if(uciok && line.indexOf("Fen") > -1){
               position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
-              socket.emit('bestMove',position+"/");
-              if (position[position.length-1] === 'b') { //Should be b, just test w.
+              socket.emit('bestMove',position);
+              if (position[position.length-1] === 'w') { //Should be b, just test w.
                   send("go movetimes 4000");
               }
           }
