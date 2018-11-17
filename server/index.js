@@ -135,6 +135,7 @@ websocket.on('connection', (socket) => {
               }
           }
           else if (line.indexOf("bestmove") > -1) {
+            socket.emit(line);
               let match = line.match(/bestmove\s+(\S+)/);
               if (match) {
                   socket.emit('bestMove', match[1]);
@@ -180,6 +181,7 @@ websocket.on('connection', (socket) => {
             redisClient.lset('gameState', data.startCell, JSON.stringify({ ...firstCell, piece: null }));
             redisClient.lset('gameState', data.endCell, JSON.stringify({ ...secondCell, piece: firstCell.piece }));
             //Update game state in stockfish.
+
             send("position fen "+ position + " moves "+ translateMoveToUCI(data.startCell, data.endCell));
             send('d');
             // Send instruction to plotter
