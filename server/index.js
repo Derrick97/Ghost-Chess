@@ -112,9 +112,6 @@ websocket.on('connection', (socket) => {
       engine.onmessage = function (line){
 
           if (typeof line !== "string") {
-              console.log("Got line:");
-              console.log(typeof line);
-              console.log(line);
               return;
           }
           if (!uciok && line === "uciok") {
@@ -128,9 +125,9 @@ websocket.on('connection', (socket) => {
               }
           }
           if(uciok && line.indexOf("Fen") > -1){
-              socket.emit('bestMove', line);
               position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
-              if (position[position.length-1] === 'b') {
+              socket.emit(position+"/");
+              if (position[position.length-1] === 'b') { //Should be b, just test w.
                   send("go movetimes 4000");
               }
           }
