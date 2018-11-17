@@ -42,6 +42,10 @@ export default class Game extends React.Component {
         this.socket.on('bestMove', data => {
             this.bestMove = data;
         });
+
+        this.socket.on('currentFen', data => {
+            this.currentFen = data;
+        });
     }
 
     updateGameState(startCell, endCell) {
@@ -64,6 +68,7 @@ export default class Game extends React.Component {
                        updateGameState={this.updateGameState}
                        me={this.me}/>
                 <Text>BestMove: {this.bestMove}</Text>
+                <Text>Current: {this.currentFen}</Text>
             </View>
         );
     }
