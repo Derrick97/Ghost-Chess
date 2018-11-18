@@ -117,6 +117,7 @@ websocket.on('connection', (socket) => {
           if (!uciok && line === "uciok") {
               uciok = true;
               if (position) {
+                  socket.emit('bestMove', "Into position.");
                   send("position " + position);
                   send("d");
                   // d will return the fen and will be caught by the next block of code.
