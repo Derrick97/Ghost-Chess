@@ -115,7 +115,6 @@ websocket.on('connection', (socket) => {
               return;
           }
           if (!uciok && line === "uciok") {
-              socket.emit('bestMove', line);
               uciok = true;
               if (position) {
                   send("position " + position);
@@ -143,6 +142,7 @@ websocket.on('connection', (socket) => {
   numPlayer++;
   if (numPlayer === 1) {
     socket.emit('setPlayer', 'white');
+      send("uci");
   } else if (numPlayer === 2) {
     socket.emit('setPlayer', 'black');
     //StockFish AI Engine
