@@ -119,7 +119,7 @@ websocket.on('connection', (socket) => {
               if (position) {
                   socket.emit('bestMove', "Into position.");
                   send("position " + position);
-                  send("d");
+                  send('d');
                   // d will return the fen and will be caught by the next block of code.
                   // d should be sent every time someone make a move. Here is the only time at uciok, because we need the initial fen.
               }
