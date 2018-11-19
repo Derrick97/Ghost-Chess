@@ -125,12 +125,12 @@ engine.onmessage = function (line) {
         position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
         websocket.emit('currentFen', position);
         if (position[position.length - 1] === 'b') {
-            websocket.emit('bestMove', "here!");
+   //         websocket.emit('bestMove', "here!");
             send("go movetimes 4000");
         }
     }
     else if (line.indexOf("bestmove") > -1) {
-        websocket.emit('bestMove', line);
+   //     websocket.emit('bestMove', line);
         let match = line.match(/bestmove\s+(\S+)/);
         if (match) {
             websocket.emit('bestMove', match[1]);
