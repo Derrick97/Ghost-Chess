@@ -113,8 +113,6 @@ engine.onmessage = function (line) {
     if (!uciok && line === "uciok") {
         uciok = true;
         if (position) {
-            websocket.emit('bestMove', "Into position.");
-            websocket.emit('currentFen', position);
             send("position " + position);
             send('d');
             // d will return the fen and will be caught by the next block of code.

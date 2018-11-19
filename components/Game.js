@@ -12,9 +12,11 @@ export default class Game extends React.Component {
         this.state = {
             gameState: null,
             player: 'black',
+            bestMove: '',
+            currentFen: '',
         };
         this.me = '';
-        this.bestMove = '';
+
         this.updateGameState = this.updateGameState.bind(this);
         // Establish socket connection
         this.socket = io('https://ghost-chess.herokuapp.com', {
@@ -40,11 +42,15 @@ export default class Game extends React.Component {
         });
 
         this.socket.on('bestMove', data => {
-            this.bestMove = data;
+            this.setState({
+                bestMove: data,
+            });
         });
 
         this.socket.on('currentFen', data => {
-            this.currentFen = data;
+            this.setState({
+                currentFen: data,
+            });
         });
     }
 
@@ -67,8 +73,8 @@ export default class Game extends React.Component {
                 <Board gameState={this.state.gameState}
                        updateGameState={this.updateGameState}
                        me={this.me}/>
-                <Text>BestMove: {this.bestMove}</Text>
-                <Text>Current: {this.currentFen}</Text>
+                <Text>BestMove: {this.state.bestMove}</Text>
+                <Text>Current: {this.state.currentFen}</Text>
             </View>
         );
     }
