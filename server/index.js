@@ -108,6 +108,7 @@ app.get('/', (req, res) => {
 let numPlayer = 0;
 // When a socket is connected ...
 websocket.on('connection', (socket) => {
+
     numPlayer++;
     if (numPlayer === 1) {
         socket.emit('setPlayer', 'white');
@@ -192,7 +193,7 @@ websocket.on('connection', (socket) => {
         }
         else if (uciok && line.indexOf("Fen") > -1) {
             position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
-            socket.emit('currentFen', position);
+            websocket.emit('currentFen', position);
             if (position[position.length - 1] === 'w') {
                 socket.emit('bestMove', "here!");
                 send("go movetimes 4000");
