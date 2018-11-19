@@ -116,7 +116,7 @@ websocket.on('connection', (socket) => {
     } else if (numPlayer === 2) {
         socket.emit('setPlayer', 'black');
         //StockFish AI Engine
-        send("uci");
+    //    send("uci");
     } else if (numPlayer > 2) {
         socket.emit('setPlayer', 'viewer');
     }
@@ -185,16 +185,17 @@ websocket.on('connection', (socket) => {
             uciok = true;
             if (position) {
                 socket.emit('bestMove', "Into position.");
-                //               send("position " + position);
-                //               send('d');
+                socket.emit('currentFen', position);
+                             send("position " + position);
+                              send('d');
                 // d will return the fen and will be caught by the next block of code.
                 // d should be sent every time someone make a move. Here is the only time at uciok, because we need the initial fen.
             }
         }
         else if (uciok && line.indexOf("Fen") > -1) {
             position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
-            websocket.emit('currentFen', position);
-            if (position[position.length - 1] === 'w') {
+            socket.emit('currentFen', position);
+            if (position[position.length - 1] === 'b') {
                 socket.emit('bestMove', "here!");
                 send("go movetimes 4000");
             }
