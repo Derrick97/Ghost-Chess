@@ -17,9 +17,9 @@ const websocket = socketio(server);
 //-------------------------StockFish Try--------------------
 function translateMoveToUCI(firstCell, secondCell) {
     let f_row = 8 - firstCell.row;
-    let f_col = 'a' + firstCell.col;
+    let f_col = String.fromCharCode("a".charCodeAt(0) + firstCell.col);
     let s_row = 8 - secondCell.row;
-    let s_col = 'a' + secondCell.col;
+    let s_col = String.fromCharCode("a".charCodeAt(0) + secondCell.col);
     return f_row.toString() + f_col + s_row.toString() + s_col;
 }
 
@@ -184,7 +184,7 @@ websocket.on('connection', (socket) => {
                             piece: firstCell.piece
                         }));
                         //Update game state in stockfish.
-websocket.emit('bestMove', translateMoveToUCI(data.startCell, data.endCell));
+websocket.emit('bestMove', translateMoveToUCI(firstCell, secondCell));
                         send("position fen " + position + " moves " + translateMoveToUCI(data.startCell, data.endCell));
                         send('d');
                         // Send instruction to plotter
