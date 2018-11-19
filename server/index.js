@@ -145,11 +145,11 @@ websocket.on('connection', (socket) => {
     numPlayer++;
     if (numPlayer === 1) {
         socket.emit('setPlayer', 'white');
-        send("uci");
+     //   send("uci");
     } else if (numPlayer === 2) {
         socket.emit('setPlayer', 'black');
         //StockFish AI Engine
-    //    send("uci");
+        send("uci");
     } else if (numPlayer > 2) {
         socket.emit('setPlayer', 'viewer');
     }
@@ -184,8 +184,7 @@ websocket.on('connection', (socket) => {
                             piece: firstCell.piece
                         }));
                         //Update game state in stockfish.
-websocket.emit('bestMove', translateMoveToUCI(firstCell, secondCell));
-                        send("position fen " + position + " moves " + translateMoveToUCI(data.startCell, data.endCell));
+                        send("position fen " + position + " moves " + translateMoveToUCI(firstCell, secondCell));
                         send('d');
                         // Send instruction to plotter
                         let instruction = generateInstruction(firstCell, secondCell);
