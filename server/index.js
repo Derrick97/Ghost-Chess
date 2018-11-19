@@ -184,7 +184,7 @@ websocket.on('connection', (socket) => {
                             piece: firstCell.piece
                         }));
                         //Update game state in stockfish.
-
+websocket.emit('bestMove', translateMoveToUCI(data.startCell, data.endCell));
                         send("position fen " + position + " moves " + translateMoveToUCI(data.startCell, data.endCell));
                         send('d');
                         // Send instruction to plotter
