@@ -105,6 +105,39 @@ app.get('/', (req, res) => {
     res.send('API working');
 });
 
+engine.onmessage = function (line) {
+
+    if (typeof line !== "string") {
+        return;
+    }
+    if (!uciok && line === "uciok") {
+        uciok = true;
+        if (position) {
+            websocket.emit('bestMove', "Into position.");
+            websocket.emit('currentFen', position);
+            send("position " + position);
+            send('d');
+            // d will return the fen and will be caught by the next block of code.
+            // d should be sent every time someone make a move. Here is the only time at uciok, because we need the initial fen.
+        }
+    }
+    else if (uciok && line.indexOf("Fen") > -1) {
+        position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
+        websocket.emit('currentFen', position);
+        if (position[position.length - 1] === 'b') {
+            websocket.emit('bestMove', "here!");
+            send("go movetimes 4000");
+        }
+    }
+    else if (line.indexOf("bestmove") > -1) {
+        websocket.emit('bestMove', line);
+        let match = line.match(/bestmove\s+(\S+)/);
+        if (match) {
+            websocket.emit('bestMove', match[1]);
+        }
+    }
+};
+
 let numPlayer = 0;
 // When a socket is connected ...
 websocket.on('connection', (socket) => {
@@ -176,38 +209,6 @@ websocket.on('connection', (socket) => {
             });
         });
     });
-    engine.onmessage = function (line) {
-
-        if (typeof line !== "string") {
-            return;
-        }
-        if (!uciok && line === "uciok") {
-            uciok = true;
-            if (position) {
-                socket.emit('bestMove', "Into position.");
-                socket.emit('currentFen', position);
-                             send("position " + position);
-                              send('d');
-                // d will return the fen and will be caught by the next block of code.
-                // d should be sent every time someone make a move. Here is the only time at uciok, because we need the initial fen.
-            }
-        }
-        else if (uciok && line.indexOf("Fen") > -1) {
-            position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
-            socket.emit('currentFen', position);
-            if (position[position.length - 1] === 'b') {
-                socket.emit('bestMove', "here!");
-                send("go movetimes 4000");
-            }
-        }
-        else if (line.indexOf("bestmove") > -1) {
-            socket.emit('bestMove', line);
-            let match = line.match(/bestmove\s+(\S+)/);
-            if (match) {
-                socket.emit('bestMove', match[1]);
-            }
-        }
-    };
 });
 
 const PORT = process.env.PORT || 5000;
