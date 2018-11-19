@@ -20,7 +20,7 @@ function translateMoveToUCI(firstCell, secondCell) {
     let f_col = String.fromCharCode("a".charCodeAt(0) + firstCell.col);
     let s_row = 8 - secondCell.row;
     let s_col = String.fromCharCode("a".charCodeAt(0) + secondCell.col);
-    return f_row.toString() + f_col + s_row.toString() + s_col;
+    return f_col + f_row.toString() + s_col + s_row.toString();
 }
 
 function send(str) {
