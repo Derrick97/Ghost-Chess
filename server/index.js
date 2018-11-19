@@ -124,7 +124,7 @@ websocket.on('connection', (socket) => {
                   // d should be sent every time someone make a move. Here is the only time at uciok, because we need the initial fen.
               }
           }
-          if(uciok && line.indexOf("Fen") > -1){
+          else if(uciok && line.indexOf("Fen") > -1){
               position = line.match(/Fen: [a-zA-Z0-9\ \/]+ [bw]+/)[0].substring(5);
               socket.emit('currentFen', position);
               if (position[position.length-1] === 'w') {
