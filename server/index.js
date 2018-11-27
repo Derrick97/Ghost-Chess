@@ -7,6 +7,7 @@ let stockfish = require("stockfish");
 let engine = stockfish();
 let uciok = false;
 let position = "startpos";
+let currentPlayer = "white";
 
 const app = express();
 app.use(BodyParser.urlencoded({extended: false}));
@@ -131,7 +132,21 @@ engine.onmessage = function (line) {
    //     websocket.emit('bestMove', line);
         let match = line.match(/bestmove\s+(\S+)/);
         if (match) {
-            websocket.emit('bestMove', match[1]);
+            //websocket.emit('bestMove', match[1]);
+            if(match[1].length !==0) {
+                let f_row = 8 - bestMove[1];
+                let f_col = bestMove.charCodeAt(0) - "a".charCodeAt(0);
+                let s_row = 8 - bestMove[3];
+                let s_col = bestMove.charCodeAt(2) - "a".charCodeAt(0);
+                let firstCell = f_row * 8 + f_col;
+                let secondCell = s_row * 8 + s_col;
+                websocket.emit('makeMove',
+                    {
+                        startCell: firstCell,
+                        endCell: secondCell,
+                    }
+                );
+            }
         }
     }
 };
@@ -143,7 +158,7 @@ websocket.on('connection', (socket) => {
     numPlayer++;
     if (numPlayer === 1) {
         socket.emit('setPlayer', 'white');
-     //   send("uci");
+        send("uci");
     } else if (numPlayer === 2) {
         socket.emit('setPlayer', 'black');
         //StockFish AI Engine
@@ -170,8 +185,7 @@ websocket.on('connection', (socket) => {
                     let gameState = reply.map(obj => JSON.parse(obj));
 
                     // Check if move is valid with the current gameState
-                    let player = data.player;
-                    let validMove = validateMove(firstCell, secondCell, gameState, player);
+                    let validMove = validateMove(firstCell, secondCell, gameState, currentPlayer);
 
                     // Update move if move is valid
                     if (validMove) {
@@ -197,6 +211,7 @@ websocket.on('connection', (socket) => {
                         redisClient.lrange('gameState', 0, -1, function (err, reply) {
                             websocket.emit('gameState', reply.map(obj => JSON.parse(obj)));
                         });
+                        currentPlayer = currentPlayer === "white" ? "black" : "white";
                     } else {
                         // Otherwise, the move is invalid ...
                         // ... return empty list to indicate move failed

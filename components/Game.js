@@ -60,7 +60,6 @@ export default class Game extends React.Component {
             {
                 startCell: startCell,
                 endCell: endCell,
-                player: this.state.player
             }
         );
     }
@@ -70,10 +69,10 @@ export default class Game extends React.Component {
             <View>
                 <Text>Player: {this.state.player}</Text>
                 <Text>Me: {this.me} </Text>
+                <Text>BestMove: {this.state.bestMove}</Text>
                 <Board gameState={this.state.gameState}
                        updateGameState={this.updateGameState}
                        me={this.me}/>
-                <Text>BestMove: {this.state.bestMove}</Text>
                 <Text>Current: {this.state.currentFen}</Text>
             </View>
         );
