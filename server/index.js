@@ -132,21 +132,7 @@ engine.onmessage = function (line) {
    //     websocket.emit('bestMove', line);
         let match = line.match(/bestmove\s+(\S+)/);
         if (match) {
-            //websocket.emit('bestMove', match[1]);
-            if(match[1].length !==0) {
-                let f_row = 8 - bestMove[1];
-                let f_col = bestMove.charCodeAt(0) - "a".charCodeAt(0);
-                let s_row = 8 - bestMove[3];
-                let s_col = bestMove.charCodeAt(2) - "a".charCodeAt(0);
-                let firstCell = f_row * 8 + f_col;
-                let secondCell = s_row * 8 + s_col;
-                websocket.emit('makeMove',
-                    {
-                        startCell: firstCell,
-                        endCell: secondCell,
-                    }
-                );
-            }
+            websocket.emit('bestMove', match[1]);
         }
     }
 };

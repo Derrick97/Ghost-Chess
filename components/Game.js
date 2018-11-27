@@ -45,6 +45,21 @@ export default class Game extends React.Component {
             this.setState({
                 bestMove: data,
             });
+            let bestMove = data;
+            if(bestMove.length !==0) {
+                let f_row = 8 - bestMove[1];
+                let f_col = bestMove.charCodeAt(0) - "a".charCodeAt(0);
+                let s_row = 8 - bestMove[3];
+                let s_col = bestMove.charCodeAt(2) - "a".charCodeAt(0);
+                let firstCell = f_row * 8 + f_col;
+                let secondCell = s_row * 8 + s_col;
+                this.socket.emit('makeMove',
+                    {
+                        startCell: firstCell,
+                        endCell: secondCell,
+                    }
+                );
+            }
         });
 
         this.socket.on('currentFen', data => {
