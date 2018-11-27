@@ -195,9 +195,11 @@ websocket.on('connection', (socket) => {
                             ...secondCell,
                             piece: firstCell.piece
                         }));
-                        //Update game state in stockfish.
-                        send("position fen " + position + " moves " + translateMoveToUCI(firstCell, secondCell));
-                        send('d');
+                        // Broadcast new gameState to all sockets
+                        redisClient.lrange('gameState', 0, -1, function (err, reply) {
+                            websocket.emit('gameState', reply.map(obj => JSON.parse(obj)));
+                        });
+                        currentPlayer = currentPlayer === "white" ? "black" : "white";
                         // Send instruction to plotter
                         let instruction = generateInstruction(firstCell, secondCell);
                         // This address changes everytime when ngrok restarts
@@ -206,12 +208,9 @@ websocket.on('connection', (socket) => {
                             headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
                             body: JSON.stringify({instructions: instruction})
                         });
-
-                        // Broadcast new gameState to all sockets
-                        redisClient.lrange('gameState', 0, -1, function (err, reply) {
-                            websocket.emit('gameState', reply.map(obj => JSON.parse(obj)));
-                        });
-                        currentPlayer = currentPlayer === "white" ? "black" : "white";
+                        //Update game state in stockfish.
+                        send("position fen " + position + " moves " + translateMoveToUCI(firstCell, secondCell));
+                        send('d');
                     } else {
                         // Otherwise, the move is invalid ...
                         // ... return empty list to indicate move failed
