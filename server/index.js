@@ -162,7 +162,7 @@ websocket.on('connection', (socket) => {
     } else if (numPlayer === 2) {
         socket.emit('setPlayer', 'black');
         //StockFish AI Engine
-        send("uci");
+   //     send("uci");
     } else if (numPlayer > 2) {
         socket.emit('setPlayer', 'viewer');
     }
