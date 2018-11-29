@@ -8,6 +8,7 @@ let engine = stockfish();
 let uciok = false;
 let position = "startpos";
 let currentPlayer = "white";
+let pvp = false;
 
 const app = express();
 app.use(BodyParser.urlencoded({extended: false}));
@@ -146,6 +147,7 @@ websocket.on('connection', (socket) => {
         socket.emit('setPlayer', 'white');
         send("uci");
     } else if (numPlayer === 2) {
+        pvp = true;
         socket.emit('setPlayer', 'black');
         //StockFish AI Engine
    //     send("uci");
@@ -195,8 +197,10 @@ websocket.on('connection', (socket) => {
                             body: JSON.stringify({instructions: instruction})
                         });
                         //Update game state in stockfish.
-                        send("position fen " + position + " moves " + translateMoveToUCI(firstCell, secondCell));
-                        send('d');
+                        if(!pvp) {
+                            send("position fen " + position + " moves " + translateMoveToUCI(firstCell, secondCell));
+                            send('d');
+                        }
                     } else {
                         // Otherwise, the move is invalid ...
                         // ... return empty list to indicate move failed
