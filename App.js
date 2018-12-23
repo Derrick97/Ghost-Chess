@@ -1,25 +1,18 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet} from 'react-native';
+import { createStackNavigator, createAppContainer } from 'react-navigation';
+
+import Home from './components/Home';
 import Game from './components/Game';
 
-export default class App extends React.Component {
-  constructor() {
-    super();
-  }
-  render() {
-    return (
-      <View style={styles.container}>
-        <Game/>
-      </View>
-    );
-  }
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+const Navigator = createStackNavigator({
+  Home: { screen: Home },
+  VersusPlayer: { screen: Game },
+  VersusAI: { screen: Game }
 });
+
+const App = createAppContainer(Navigator);
+
+export default App;
+
