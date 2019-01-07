@@ -406,26 +406,28 @@ function generateMoveInstruction(from, to, pistolStatus) {
   let endX = to.row;
   let endY = to.col;
   let command = '';
+  command = command + "2010#4010#";
   if (endX <= startX) {
-    command = command + '0' + (startX - endX) * 2 + pistolStatus + '#'
+    command = command + '0' + str((startX - endX) * 2) + pistolStatus + '#'
   } else {
-    command = command + '4' + (endX - startX) * 2 + pistolStatus + '#'
+    command = command + '4' + str((endX - startX) * 2) + pistolStatus + '#'
   }
   if (endY <= startY) {
-    command = command + '6' + (startY - endY) * 2 + pistolStatus + '#'
+    command = command + '6' + str((startY - endY) * 2) + pistolStatus + '#'
   } else {
-    command = command + '2' + (endY - startY) * 2 + pistolStatus + '#'
+    command = command + '2' + str((endY - startY) * 2) + pistolStatus + '#'
   }
+  command = command + "0010#6010#";
   return command;
 }
 
 
 // TODO: Return instruction code to plotter
 function generateInstruction(startCell, endCell) {
-  let origin = { col: 0, rol: 0, piece: null };
-  return (generateMoveInstruction(origin, startCell, 0)
-    + generateMoveInstruction(startCell, endCell, 1)
-    + generateMoveInstruction(endCell, origin, 0));
+  let origin = { col: 0, row: 0, piece: null };
+  return (generateMoveInstruction(origin, startCell, '0')
+    + generateMoveInstruction(startCell, endCell, '1')
+    + generateMoveInstruction(endCell, origin, '1'));
   // let instructionSet = '';
   // let startRow = startCell.row;
   // let startCol = startCell.col;
