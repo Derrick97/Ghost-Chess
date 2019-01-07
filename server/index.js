@@ -191,7 +191,7 @@ websocket.on('connection', (socket) => {
                         // Send instruction to plotter
                         let instruction = generateInstruction(firstCell, secondCell);
                         // This address changes everytime when ngrok restarts
-                        fetch('https://cc8f4ab9.ngrok.io/movePlotter', {
+                      fetch('https://8e45c326.ngrok.io/movePlotter', {
                             method: 'POST',
                             headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
                             body: JSON.stringify({instructions: instruction})
