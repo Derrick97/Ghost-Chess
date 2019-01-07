@@ -126,7 +126,7 @@ engine.onmessage = function (line) {
     websocket.emit('currentFen', position);
     if (position[position.length - 1] === 'b') {
       //         websocket.emit('bestMove', "here!");
-      send("go movetimes 4000");
+      send("go movetimes 20000");
     }
   }
   else if (line.indexOf("bestmove") > -1) {
@@ -224,7 +224,7 @@ server.listen(PORT, () => console.log(`listening on *:${PORT}`));
 
 function validateMove(firstCell, secondCell, gameState, player) {
   // Check first cell contains piece
-  if (firstCell.piece == null) return false;
+  if (firstCell.piece === null) return false;
   // Check that player is moving their own chess
   if (firstCell.piece.color !== player) return false;
   // Check the two cells are different
@@ -408,14 +408,14 @@ function generateMoveInstruction(from, to, pistolStatus) {
   let command = '';
   command = command + "2010#4010#";
   if (endX <= startX) {
-    command = command + '0' + String((startX - endX) * 2) + pistolStatus + '#'
+    command = command + '0' + String((startX - endX) * 2).padStart(2, '0') + pistolStatus + '#'
   } else {
-    command = command + '4' + String((endX - startX) * 2) + pistolStatus + '#'
+    command = command + '4' + String((endX - startX) * 2).padStart(2, '0') + pistolStatus + '#'
   }
   if (endY <= startY) {
-    command = command + '6' + String((startY - endY) * 2) + pistolStatus + '#'
+    command = command + '6' + String((startY - endY) * 2).padStart(2, '0') + pistolStatus + '#'
   } else {
-    command = command + '2' + String((endY - startY) * 2) + pistolStatus + '#'
+    command = command + '2' + String((endY - startY) * 2).padStart(2, '0') + pistolStatus + '#'
   }
   command = command + "0010#6010#";
   return command;
