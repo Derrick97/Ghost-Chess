@@ -7,8 +7,8 @@ const io = require('socket.io-client');
 
 export default class Game extends React.Component {
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       gameState: null,
       player: 'black',
@@ -18,6 +18,7 @@ export default class Game extends React.Component {
     this.me = '';
 
     this.updateGameState = this.updateGameState.bind(this);
+    const { navigation } = this.props;
     // Establish socket connection
     this.socket = io('https://ghost-chess.herokuapp.com', {
       transports: ['websocket'],
@@ -84,6 +85,7 @@ export default class Game extends React.Component {
     const { navigation } = this.props;
     return (
       <View>
+        <Text>PVP: {JSON.stringify(navigation.getParam('pvp'))} </Text>
         <Text>Player: {this.state.player}</Text>
         <Text>Me: {this.me} </Text>
         <Text>BestMove: {this.state.bestMove}</Text>
