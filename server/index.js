@@ -142,12 +142,14 @@ let numPlayer = 0;
 // When a socket is connected ...
 websocket.on('connection', (socket) => {
 
+    console.log(socket.handshake.query.pvp);
+    pvp = socket.handshake.query.pvp === 'true';
+
     numPlayer++;
     if (numPlayer === 1) {
         socket.emit('setPlayer', 'white');
         send("uci");
     } else if (numPlayer === 2) {
-        pvp = true;
         socket.emit('setPlayer', 'black');
         //StockFish AI Engine
    //     send("uci");
