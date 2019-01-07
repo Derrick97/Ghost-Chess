@@ -408,14 +408,14 @@ function generateMoveInstruction(from, to, pistolStatus) {
   let command = '';
   command = command + "2010#4010#";
   if (endX <= startX) {
-    command = command + '0' + str((startX - endX) * 2) + pistolStatus + '#'
+    command = command + '0' + String((startX - endX) * 2) + pistolStatus + '#'
   } else {
-    command = command + '4' + str((endX - startX) * 2) + pistolStatus + '#'
+    command = command + '4' + String((endX - startX) * 2) + pistolStatus + '#'
   }
   if (endY <= startY) {
-    command = command + '6' + str((startY - endY) * 2) + pistolStatus + '#'
+    command = command + '6' + String((startY - endY) * 2) + pistolStatus + '#'
   } else {
-    command = command + '2' + str((endY - startY) * 2) + pistolStatus + '#'
+    command = command + '2' + String((endY - startY) * 2) + pistolStatus + '#'
   }
   command = command + "0010#6010#";
   return command;
