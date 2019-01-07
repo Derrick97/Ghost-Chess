@@ -264,20 +264,17 @@ function getCell(col, row, gameState) {
 }
 
 function validateKing(firstCell, secondCell) {
-    console.log('Validating King Move ...');
     // A move from (C1, R1) to (C2, R2) is valid iff |C1-C2| <= 1 and |R1-R2| <= 1
     return Math.abs(firstCell.col - secondCell.col) <= 1 &&
         Math.abs(firstCell.row - secondCell.row) <= 1
 }
 
 function validateQueen(firstCell, secondCell, gameState) {
-    console.log('Validating Queen Move ...');
     // A move is valid if it is a valid move for root or valid move for bishop
     return validateRook(firstCell, secondCell, gameState) || validateBishop(firstCell, secondCell, gameState);
 }
 
 function validateBishop(firstCell, secondCell, gameState) {
-    console.log('Validating Bishop Move ...');
     // A move from (C1, R1) to (C2, R2) is valid iff |C1-C2| == |R1-R2|
     if (Math.abs(firstCell.col - secondCell.col) !== Math.abs(firstCell.row - secondCell.row)) return false;
 
@@ -317,7 +314,6 @@ function validateBishop(firstCell, secondCell, gameState) {
 }
 
 function validateHorse(firstCell, secondCell) {
-    console.log('Validating Horse Move ...');
     // A move from (C1, R1) to (C2, R2) is valid iff
     // |C1-C2| == 1 and |R1-R2| == 2  OR |C1-C2| == 2 and |R1-R2| == 1
     return (Math.abs(firstCell.col - secondCell.col) === 1 && Math.abs(firstCell.row - secondCell.row) === 2) ||
@@ -325,7 +321,6 @@ function validateHorse(firstCell, secondCell) {
 }
 
 function validateRook(firstCell, secondCell, gameState) {
-    console.log('Validating Rook Move ...');
     // A move from (C1, R1) to (C2, R2) is valid iff C1 == C2 or R1 == R2
     if (!(firstCell.col === secondCell.col || firstCell.row === secondCell.row)) return false;
 
@@ -359,7 +354,6 @@ function validateRook(firstCell, secondCell, gameState) {
 }
 
 function validatePawn(firstCell, secondCell) {
-    console.log('Validating Pawn Move ...');
 
     let rowDifference = Math.abs(firstCell.row - secondCell.row);
     let colDifference = Math.abs(firstCell.col - secondCell.col);
@@ -370,8 +364,7 @@ function validatePawn(firstCell, secondCell) {
     // 2. Two steps forward (When in starting position)
     let moveTwo = colDifference === 0 && rowDifference === 2;
     // 3. Capture enemy piece
-    let capture = secondCell.piece && (firstCell.piece.color !== secondCell.piece.color)
-        && (rowDifference === 1) && (colDifference === 1);
+    let capture = secondCell.piece != null && firstCell.piece.color !== secondCell.piece.color && rowDifference === 1 && colDifference === 1;
     //If the piece is black ...
     if (firstCell.piece.color === 'black') {
         let moveForward = firstCell.row < secondCell.row;
@@ -460,3 +453,14 @@ function generateInstruction(startCell, endCell) {
     // instructionSet = gotoStartRow + gotoStartCol + startToEndRow + startToEndCol;
     // return instructionSet;
 }
+
+
+module.exports.validateRook = validateRook;
+module.exports.validateHorse = validateHorse;
+module.exports.validateBishop = validateBishop;
+module.exports.validateKing = validateKing;
+module.exports.validateQueen = validateQueen;
+module.exports.validatePawn = validatePawn;
+module.exports.validateMove = validateMove;
+
+

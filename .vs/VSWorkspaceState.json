@@ -3,8 +3,9 @@
     "",
     "\\components",
     "\\server",
+    "\\server\\test",
     "\\xy-plotter"
   ],
-  "SelectedNode": "\\server\\package.json",
+  "SelectedNode": "\\server\\test\\test.js",
   "PreviewInSolutionExplorer": false
 }
