@@ -148,7 +148,7 @@ websocket.on('connection', (socket) => {
   if (!pvp) {
     socket.emit('setPlayer', 'white');
     send("uci");
-  } else if (pvp && numPlayer === 1) {
+  } else if (numPlayer === 1) {
     socket.emit('setPlayer', 'white');
   } else if (numPlayer === 2) {
     socket.emit('setPlayer', 'black');
