@@ -9,6 +9,7 @@ let uciok = false;
 let position = "startpos";
 let currentPlayer = "white";
 let pvp = false;
+let lastCell = { row: 0, col: 0, cell: null };
 
 const app = express();
 app.use(BodyParser.urlencoded({ extended: false }));
@@ -424,10 +425,11 @@ function generateMoveInstruction(from, to, pistolStatus) {
 
 // TODO: Return instruction code to plotter
 function generateInstruction(startCell, endCell) {
-  let origin = { col: 0, row: 0, piece: null };
-  return (generateMoveInstruction(origin, startCell, '0')
-    + generateMoveInstruction(startCell, endCell, '1')
-    + generateMoveInstruction(endCell, origin, '1'));
+  let instruction = generateMoveInstruction(lastCell, startCell, '0')
+    + generateMoveInstruction(startCell, endCell, '1');
+  lastCell = endCell;
+  return instruction;
+    
   // let instructionSet = '';
   // let startRow = startCell.row;
   // let startCol = startCell.col;
