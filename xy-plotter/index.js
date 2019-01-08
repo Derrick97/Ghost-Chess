@@ -9,14 +9,27 @@ app.use(BodyParser.json());
 // Set up port to xy plotter (Port name might be different everytime)
 const port = new SerialPort('COM3', { baudRate: 115200 });
 
+let instructions = [];
+
+
 app.get('/', (req, res) => {
   res.send('API working');
 });
 
+port.on('data', function (data) {
+  console.log(String(data));
+  if (String(data).substring(0, 8) === 'executed' && instructions.length > 0) {
+    port.write(instructions.shift());
+  }
+});
+
+
+
 app.post('/movePlotter', (req, res) => {
   // Sends instruction to plotter serial port
-  console.log(req.body.instructions);
-  port.write(req.body.instructions);
+  //console.log(req.body.instructions);
+  instructions.push(req.body.instructions);
+  
   res.send("Done!");
 });
 

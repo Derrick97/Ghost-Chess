@@ -407,7 +407,7 @@ function generateMoveInstruction(from, to, pistolStatus) {
   let endX = to.row;
   let endY = to.col;
   let command = '';
-  command = command + "2010#4010#";
+  command = command + "201" + pistolStatus + "#401" + pistolStatus + "#";
   if (endX <= startX) {
     command = command + '0' + String((startX - endX) * 2).padStart(2, '0') + pistolStatus + '#'
   } else {
@@ -418,7 +418,7 @@ function generateMoveInstruction(from, to, pistolStatus) {
   } else {
     command = command + '2' + String((endY - startY) * 2).padStart(2, '0') + pistolStatus + '#'
   }
-  command = command + "0010#6010#";
+  command = command + "001" + pistolStatus + "#601" + pistolStatus + "#";
   return command;
 }
 
