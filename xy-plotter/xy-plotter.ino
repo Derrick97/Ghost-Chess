@@ -10,7 +10,7 @@ struct command {
   int direction = 0;
   int distance = -1;
   boolean magnet =false;
-}commands[30];
+}commands[40];
 
 double angle_rad = PI/180.0;
 double angle_deg = 180.0/PI;
@@ -20,7 +20,7 @@ MeStepper stepper_2(2);
 
 double MaxSpeed = 100.0;
 double Speed = 100.0;
-double HalfCellSize = 116.7;
+double HalfCellSize = 95.24;
 
 MePort port(4);
 
@@ -34,6 +34,7 @@ char buffer[4];
 // index: how many command in commands
 int WriteIndex=0;
 int ReadIndex=0;
+int o = 0;
 
 bool motorAvailable = true;
 bool serialIsAvailable = true;
@@ -41,11 +42,15 @@ bool serialIsAvailable = true;
 
 void setup(){
     Serial.begin(115200);
-    Serial.println("Connected");
+    Serial.print("Connected");
 }
 
 void loop(){
     if (serialIsAvailable) {
+      Serial.print("executed");
+      Serial.println(o);
+      o++;
+      delay(2000);
       while(Serial.available()){
         delay(100);
         if(Serial.available()>=5){
@@ -92,7 +97,7 @@ void loop(){
        Serial.println(commands[ReadIndex].distance);
        Serial.println(commands[ReadIndex].magnet);
 
-        port.dWrite1(!commands[ReadIndex].magnet);
+        port.dWrite1(commands[ReadIndex].magnet);
         delay(100);
         
        int x = 0;
