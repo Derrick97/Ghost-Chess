@@ -9,6 +9,7 @@ let uciok = false;
 let position = "startpos";
 let currentPlayer = "white";
 let pvp = false;
+let lastCell = { row: 0, col: 0, cell: null };
 
 const app = express();
 app.use(BodyParser.urlencoded({ extended: false }));
@@ -194,7 +195,7 @@ websocket.on('connection', (socket) => {
             // Send instruction to plotter
             let instruction = generateInstruction(firstCell, secondCell);
             // This address changes everytime when ngrok restarts
-            fetch('https://83f887f9.ngrok.io/movePlotter', {
+            fetch('https://a344ed75.ngrok.io/movePlotter', {
               method: 'POST',
               headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
               body: JSON.stringify({ instructions: instruction })
@@ -406,7 +407,7 @@ function generateMoveInstruction(from, to, pistolStatus) {
   let endX = to.row;
   let endY = to.col;
   let command = '';
-  command = command + "2010#4010#";
+  command = command + "201" + pistolStatus + "#401" + pistolStatus + "#";
   if (endX <= startX) {
     command = command + '0' + String((startX - endX) * 2).padStart(2, '0') + pistolStatus + '#'
   } else {
@@ -417,17 +418,18 @@ function generateMoveInstruction(from, to, pistolStatus) {
   } else {
     command = command + '2' + String((endY - startY) * 2).padStart(2, '0') + pistolStatus + '#'
   }
-  command = command + "0010#6010#";
+  command = command + "001" + pistolStatus + "#601" + pistolStatus + "#";
   return command;
 }
 
 
 // TODO: Return instruction code to plotter
 function generateInstruction(startCell, endCell) {
-  let origin = { col: 0, row: 0, piece: null };
-  return (generateMoveInstruction(origin, startCell, '0')
-    + generateMoveInstruction(startCell, endCell, '1')
-    + generateMoveInstruction(endCell, origin, '1'));
+  let instruction = generateMoveInstruction(lastCell, startCell, '0')
+    + generateMoveInstruction(startCell, endCell, '1');
+  lastCell = endCell;
+  return instruction;
+    
   // let instructionSet = '';
   // let startRow = startCell.row;
   // let startCol = startCell.col;
