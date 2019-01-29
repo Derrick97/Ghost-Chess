@@ -1,5 +1,5 @@
 # Ghost-Chess (Project Proposal from Theodo)
-Developer: Chi Zhang, Wai Lee, Tim Cheuk, Hao Mang, Terrence Chan, Jian Rong(me). \n
+Developer: Chi Zhang, Wai Lee, Tim Cheuk, Hao Mang, Terrence Chan, Jian Rong(me). 
 This is the Software Engineering Group Project from the 1st Term of the 3rd year in Imperial College. We use React-Native to write a native app that can be used in both iOS/Android, use nodeJS to write the backend for sending commands to the Arduino Board and updating chess board, and compile and test using Expo. Using the app, it is able to control a Arduino Board, to move chess pieces on a magnetic chess board. So when a people controlling the client app, and move a piece, the movement will be reflected on the chess board.
 The flow chart will be added later.
 --CAVEAT--:
